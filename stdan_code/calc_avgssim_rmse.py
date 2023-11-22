@@ -13,7 +13,10 @@ Calculate the average SSIM and RMSE for n frames
 
 '''
 # video '000' to '019'
-csv_list = sorted(glob.glob(os.path.join('SSIM_csv', '*.csv')))
+exp_name = 'STDAN_Stack_BSD_3ms24ms_best-ckpt'
+exp_path = os.path.join(os.environ['HOME'], 'STDAN', 'exp_log', 'test', exp_name)
+
+csv_list = sorted(glob.glob(os.path.join(exp_path, 'SSIM_csv', '*.csv')))
 seq_list = [os.path.splitext(os.path.basename(f))[0] for f in csv_list]
 
 avg_df = pd.DataFrame({
@@ -44,4 +47,4 @@ avg_df.loc['Average', 'RMSE'] = avg_df['RMSE'].mean()
 
 print(avg_df)
 
-avg_df.to_csv('average.csv', index=False) # save to .csv
+avg_df.to_csv(os.path.join(exp_path, 'average.csv'), index=False) # save to .csv

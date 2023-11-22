@@ -12,25 +12,19 @@ plot SSIM graph
 [Output] SSIM graph of each video (./SSIM_graph_woSIRR/xxx.png)
 
 '''
-csv_list = sorted(glob.glob(os.path.join('SSIM_csv', '*.csv')))
-edvr_cdv_list = sorted(glob.glob(os.path.join('edvr_SSIM_csv', '*.csv')))
-for csv, edvr_csv in zip(csv_list, edvr_cdv_list):
+
+exp_name = 'STDAN_Stack_BSD_3ms24ms_best-ckpt'
+exp_path = os.path.join(os.environ['HOME'], 'STDAN', 'exp_log', 'test', exp_name)
+
+csv_list = sorted(glob.glob(os.path.join(exp_path, 'SSIM_csv', '*.csv')))
+for csv in csv_list:
 
     df = pd.read_csv(csv)
-    edvr_df = pd.read_csv(edvr_csv)
 
     frame = df['frame']
     output = df['output']
-    edvr = edvr_df['EDVR']
-    edvr = edvr[2:-2]
-    wopd_tsa = edvr_df['woPD_woTSA']
-    wopd_tsa = wopd_tsa[2:-2]
 
     output_LPF = df['output_LPF']
-    edvr_LPF = edvr_df['EDVR_LPF']
-    edvr_LPF = edvr_LPF[2:-2]
-    wopd_tsa_LPF = edvr_df['woPD_woTSA_LPF']
-    wopd_tsa_LPF = wopd_tsa_LPF[2:-2]
 
 
     ### plot SSIM graph ###
@@ -45,16 +39,9 @@ for csv, edvr_csv in zip(csv_list, edvr_cdv_list):
     ax.set_ylabel('SSIM', fontsize=12)
     ax.set_xticks(np.arange(0,100, step=10))
 
-    
-    #ax.plot(frame, sirr_LPF, c='black', ls='-', lw=1, alpha=0.5) 
-    ax.plot(frame, edvr_LPF, c='tab:blue', ls='-', lw=0.5, alpha=0.4)
-    ax.plot(frame, edvr, c='tab:blue', ls='-', lw=1.5, alpha=1, label='EDVR')
-
-    ax.plot(frame, wopd_tsa_LPF, c='tab:green', ls='-', lw=0.5, alpha=0.4)
-    ax.plot(frame, wopd_tsa, c='tab:green', ls='-', lw=1.5, alpha=1, label='woPD_TSA')
 
     ax.plot(frame, output_LPF, c='tab:red', ls='-', lw=0.5, alpha=0.4)
-    ax.plot(frame, output, c='tab:red', ls='-', lw=1.5, alpha=1, label='Zhang et al.')
+    ax.plot(frame, output, c='tab:red', ls='-', lw=1.5, alpha=1, label='STDAN')
 
 
 
@@ -62,7 +49,7 @@ for csv, edvr_csv in zip(csv_list, edvr_cdv_list):
     ax.legend(loc='upper center', bbox_to_anchor=(.5, -.20), ncol=3)
     plt.tight_layout()
 
-    savepath = 'SSIM_graph'
+    savepath = os.path.join(exp_path, 'SSIM_graph')
     if not os.path.isdir(savepath):
         os.makedirs(savepath, exist_ok=True)
 

@@ -2,35 +2,34 @@ from PIL import Image
 import os
 import glob
 from tqdm import tqdm
+from pygifsicle import gifsicle
 
-# path = '/home/moriyamasota/STDAN/exp_log/test/STDAN_Stack_REDS_ckpt-epoch-0400'
-path = '/home/moriyamasota/datasets/REDS_flip'
-file_type = 'input'
+path = '../datasets/BSD_3ms24ms'
+file_type_list = ['Blur', 'Sharp']
 
-gif_path = os.path.join(path, 'gif')
+for file_type in file_type_list:
 
-if not os.path.exists(gif_path):
-    os.makedirs(gif_path)
+    gif_path = os.path.join(path, 'gif', file_type)
 
-if file_type in ['input', 'GT']:
+    if not os.path.exists(gif_path):
+        os.makedirs(gif_path)
+
     seq_list = sorted(os.listdir(os.path.join(path, 'test')))
-else:
-    seq_list = sorted(os.listdir(os.path.join(path, 'output')))
 
-for seq in tqdm(seq_list):
+    for seq in tqdm(seq_list):
 
-    pictures = []
+        pictures = []
 
-    if file_type in ['input', 'GT']:
-        # print(os.path.join(path, 'test', seq, file_type, '*.png'))
-        file_list = sorted(glob.glob(os.path.join(path, 'test', seq, file_type, '*.png')))
+        file_list = sorted(glob.glob(os.path.join(path, 'test', seq, file_type, 'RGB', '*.png')))
         file_list = file_list[2:-2]
-    else:
-        file_list = sorted(glob.glob(os.path.join(path, 'output', seq, '*.png')))
 
-    for file in file_list:
-        img = Image.open(file).quantize()
-        pictures.append(img)
+        for file in file_list:
+            img = Image.open(file).quantize()
+            img_resize = img.resize((img.width//2, img.height//2))
+            pictures.append(img_resize)
 
-    pictures[0].save(os.path.join(gif_path, seq + '.gif'),save_all=True, append_images=pictures[1:], optimize=True, loop=0)
+        pictures[0].save(os.path.join(gif_path, seq + '.gif'),save_all=True, append_images=pictures[1:], optimize=True, loop=0)
+
+        gifsicle(sources=os.path.join(gif_path, seq + '.gif'), destination=os.path.join(gif_path, seq + '.gif') ,optimize=False,colors=256,options=["--optimize=3"]
+)
 

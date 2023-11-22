@@ -60,15 +60,15 @@ class Calc_SSIM():
     def calc_LPF(self):
         self.ssim_LPF_list = valid_convolve(self.ssim_list, self.filter_size)
 
-
-gt_path = os.path.join(os.environ['HOME'], 'datasets', 'REDS', 'test')
-output_path = os.path.join(os.environ['HOME'], 'STDAN', 'exp_log', 'test', 'STDAN_Stack_REDS_ckpt-epoch-0400', 'output')
+exp_name = 'STDAN_Stack_BSD_3ms24ms_best-ckpt'
+gt_path = os.path.join(os.environ['HOME'], 'datasets', 'BSD_3ms24ms', 'test')
+output_path = os.path.join(os.environ['HOME'], 'STDAN', 'exp_log', 'test', exp_name, 'output')
 seq_list = [f for f in sorted(os.listdir(output_path)) if os.path.isdir(os.path.join(output_path, f))]
 
 for seq in seq_list:
         
     print(seq)
-    gt = Calc_SSIM(fdir = os.path.join(gt_path, seq, 'GT'))
+    gt = Calc_SSIM(fdir = os.path.join(gt_path, seq, 'Sharp', 'RGB'))
     output = Calc_SSIM(fdir = os.path.join(output_path, seq))
     gt.files = gt.files[2:-2]
 
@@ -93,7 +93,7 @@ for seq in seq_list:
                 }
     )
 
-    save_path = './SSIM_csv'
+    save_path = os.path.join(os.environ['HOME'], 'STDAN', 'exp_log', 'test', exp_name,'SSIM_csv')
     if not os.path.isdir(save_path):
         os.makedirs(save_path, exist_ok=True)
 
