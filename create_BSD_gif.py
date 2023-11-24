@@ -3,15 +3,15 @@ import os
 import glob
 from tqdm import tqdm
 
-path = '/mnt/d/dataset/BSD_3ms24ms'
-file_type = 'valid'
+# path = '/mnt/d/dataset/BSD_3ms24ms'
+path = '../dataset/BSD_3ms24ms'
+file_type = 'test'
 
-gif_path = os.path.join(path, 'gif')
+gif_path = os.path.join(path, 'gif', file_type)
 
 if not os.path.exists(gif_path):
-    os.makedirs(gif_path)
-    os.makedirs(os.path.join(gif_path, 'Blur'))
-    os.makedirs(os.path.join(gif_path, 'Sharp'))
+    os.makedirs(os.path.join(gif_path, 'Blur'), exist_ok=True)
+    os.makedirs(os.path.join(gif_path, 'Sharp'), exist_ok=True)
 
 
 seq_list = sorted(os.listdir(os.path.join(path, file_type)))
@@ -32,5 +32,5 @@ for seq in tqdm(seq_list):
             print(file_list)
             print('picture empty')
             exit()
-        pictures[0].save(os.path.join(gif_path, input_type, file_type + '_' + seq + '.gif'),save_all=True, append_images=pictures[1:], optimize=True, loop=0)
+        pictures[0].save(os.path.join(gif_path, input_type, seq + '.gif'),save_all=True, append_images=pictures[1:], optimize=True, loop=0)
 

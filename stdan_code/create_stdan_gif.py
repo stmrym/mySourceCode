@@ -4,9 +4,9 @@ import glob
 from tqdm import tqdm
 from pygifsicle import gifsicle
 
-path = '../../STDAN/exp_log/test/STDAN_Stack_BSD_3ms24ms_best-ckpt'
-# file_type_list = ['output', 'flow_forward', 'flow_hsv']
-file_type_list = ['flow_forward', 'flow_hsv']
+path = '../../STDAN_modified/exp_log/test/20231124_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0455'
+file_type_list = ['output', 'flow_forward', 'flow_hsv']
+# file_type_list = ['flow_forward', 'flow_hsv']
 
 
 for file_type in file_type_list:
