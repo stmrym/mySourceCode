@@ -22,10 +22,15 @@ for seq in tqdm(seq_list):
 
     for input_type in ['Blur', 'Sharp']:
         file_list = sorted(glob.glob(os.path.join(path, file_type, seq, input_type, 'RGB', '*.png')))
+        file_list = file_list[2:-2]
 
         for file in file_list:
             img = Image.open(file)
+            resize_w = img.width // 2
+            resize_h = img.height // 2
+            img = img.resize((resize_w, resize_h))
             pictures.append(img)
+
 
         if pictures == []:
             print(os.path.join(path, file_type, seq, input_type, 'RGB'))

@@ -27,6 +27,8 @@ for file_type in file_type_list:
             img = Image.open(file).quantize()
             img_resize = img.resize((img.width//2, img.height//2))
             pictures.append(img_resize)
+        
+        
 
         pictures[0].save(os.path.join(gif_path, seq + '.gif'),save_all=True, append_images=pictures[1:], optimize=True, loop=0)
 

@@ -13,20 +13,40 @@ plot SSIM graph
 
 '''
 
-exp_name = 'STDAN_Stack_BSD_3ms24ms_best-ckpt'
-exp_path = os.path.join(os.environ['HOME'], 'STDAN', 'exp_log', 'test', exp_name)
+class dataFrame():
+    def __init__(self, exp_path=''):
+        self.exp_path = exp_path
+        self.csv_list = sorted(glob.glob(os.path.join(self.exp_path, '*.csv')))
+        self.num_csv = len(self.csv_list)
 
-csv_list = sorted(glob.glob(os.path.join(exp_path, 'SSIM_csv', '*.csv')))
-for csv in csv_list:
+    def get_seq(self, id):
+        self.seq = os.path.splitext(os.path.basename(self.csv_list[id]))[0]
+        return self.seq
+    
+    def get_frame(self, id):
+        self.frame = pd.read_csv(self.csv_list[id])['frame']
+        return self.frame
+    
+    def plot(self, id=0, frame=0, col_name='', color='tab:red', label='sample'):
+        self.df = pd.read_csv(self.csv_list[id])
+        ax.plot(frame, self.df[col_name +  '_LPF'], c=color, ls='-', lw=0.5, alpha=0.4)
+        ax.plot(frame, self.df[col_name], c=color, ls='-', lw=1.5, alpha=1, label=label)
 
-    df = pd.read_csv(csv)
-
-    frame = df['frame']
-    output = df['output']
-
-    output_LPF = df['output_LPF']
+        
+vdtr = dataFrame(exp_path = os.path.join('..', '..', 'VDTR_result', 'csv_SSIM'))
+stdan = dataFrame(exp_path = os.path.join('..', '..', 'STDAN_modified', 'exp_log', 'test', '20231124_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0455', 'SSIM_csv'))
 
 
+savepath = os.path.join('..', '..', 'STDAN_modified', 'exp_log', 'test', '20231124_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0455', 'SSIM_graph')
+if not os.path.isdir(savepath):
+    os.makedirs(savepath, exist_ok=True)
+
+# exp_name = 'STDAN_Stack_BSD_3ms24ms_best-ckpt'
+# exp_path = os.path.join(os.environ['HOME'], 'STDAN', 'exp_log', 'test', exp_name)
+
+for id in range(vdtr.num_csv):
+
+    frame = stdan.get_frame(id)
     ### plot SSIM graph ###
 
 
@@ -40,18 +60,15 @@ for csv in csv_list:
     ax.set_xticks(np.arange(0,100, step=10))
 
 
-    ax.plot(frame, output_LPF, c='tab:red', ls='-', lw=0.5, alpha=0.4)
-    ax.plot(frame, output, c='tab:red', ls='-', lw=1.5, alpha=1, label='STDAN')
-
+    vdtr.plot(id=id, frame=frame, col_name='VDTR', color='black', label='VDTR')
+    vdtr.plot(id=id, frame=frame, col_name='C_T10K', color='tab:blue', label='VDTR + Temopral (Proposed)')
+    stdan.plot(id=id, frame=frame, col_name='output', color='tab:red', label='STDAN')
 
 
     #ax.legend(loc='lower center', ncol=4) 
     ax.legend(loc='upper center', bbox_to_anchor=(.5, -.20), ncol=3)
     plt.tight_layout()
 
-    savepath = os.path.join(exp_path, 'SSIM_graph')
-    if not os.path.isdir(savepath):
-        os.makedirs(savepath, exist_ok=True)
-
-    seq = os.path.splitext(os.path.basename(csv))[0]
+    
+    seq = vdtr.get_seq(id)
     plt.savefig(os.path.join(savepath, seq + '.png'), transparent=False, dpi=300, bbox_inches='tight')
