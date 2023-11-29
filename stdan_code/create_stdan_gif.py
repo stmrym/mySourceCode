@@ -4,10 +4,16 @@ import glob
 from tqdm import tqdm
 from pygifsicle import gifsicle
 
-# path = '../../STDAN_modified/exp_log/test/20231124_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0455'
-path = '../../dataset/BSD_3ms24ms'
-# file_type_list = ['output', 'flow_forward', 'flow_hsv']
-file_type_list = ['seg', 'blended']
+mode = 'seg'
+exp_name = '20231129_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0905'
+
+if mode in ['output', 'seg']:
+    path = '../../STDAN_modified/exp_log/test/' + exp_name
+
+if mode == 'output':
+    file_type_list = ['output', 'flow_forward', 'flow_hsv']
+elif mode == 'seg':    
+    file_type_list = ['seg', 'blended']
 
 
 for file_type in file_type_list:
@@ -18,14 +24,12 @@ for file_type in file_type_list:
         os.makedirs(gif_path)
 
     seq_list = sorted(os.listdir(os.path.join(path, file_type)))
-    # seq_list = sorted(os.listdir(os.path.join(path, 'sam')))
 
     for seq in tqdm(seq_list):
 
         pictures = []
 
         file_list = sorted(glob.glob(os.path.join(path, file_type, seq, '*.png')))
-        # file_list = sorted(glob.glob(os.path.join(path, 'sam', seq, file_type, '*.png')))
 
         for file in file_list:
             img = Image.open(file).quantize()

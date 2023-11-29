@@ -33,18 +33,16 @@ class dataFrame():
         ax.plot(frame, self.df[col_name], c=color, ls='-', lw=1.5, alpha=1, label=label)
 
         
-vdtr = dataFrame(exp_path = os.path.join('..', '..', 'VDTR_result', 'csv_SSIM'))
-stdan = dataFrame(exp_path = os.path.join('..', '..', 'STDAN_modified', 'exp_log', 'test', '20231124_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0455', 'SSIM_csv'))
+# vdtr = dataFrame(exp_path = os.path.join('..', '..', 'VDTR_result', 'csv_SSIM'))
+stdan = dataFrame(exp_path = os.path.join('..', '..', 'STDAN_modified', 'exp_log', 'test', '20231129_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0905', 'SSIM_csv'))
 
+savepath = os.path.join('..', '..', 'STDAN_modified', 'exp_log', 'test', '20231129_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0905', 'SSIM_graph')
 
-savepath = os.path.join('..', '..', 'STDAN_modified', 'exp_log', 'test', '20231124_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0455', 'SSIM_graph')
 if not os.path.isdir(savepath):
     os.makedirs(savepath, exist_ok=True)
 
-# exp_name = 'STDAN_Stack_BSD_3ms24ms_best-ckpt'
-# exp_path = os.path.join(os.environ['HOME'], 'STDAN', 'exp_log', 'test', exp_name)
 
-for id in range(vdtr.num_csv):
+for id in range(stdan.num_csv):
 
     frame = stdan.get_frame(id)
     ### plot SSIM graph ###
@@ -60,8 +58,8 @@ for id in range(vdtr.num_csv):
     ax.set_xticks(np.arange(0,100, step=10))
 
 
-    vdtr.plot(id=id, frame=frame, col_name='VDTR', color='black', label='VDTR')
-    vdtr.plot(id=id, frame=frame, col_name='C_T10K', color='tab:blue', label='VDTR + Temopral (Proposed)')
+    # vdtr.plot(id=id, frame=frame, col_name='VDTR', color='black', label='VDTR')
+    # vdtr.plot(id=id, frame=frame, col_name='C_T10K', color='tab:blue', label='VDTR + Temopral (Proposed)')
     stdan.plot(id=id, frame=frame, col_name='output', color='tab:red', label='STDAN')
 
 
@@ -70,5 +68,5 @@ for id in range(vdtr.num_csv):
     plt.tight_layout()
 
     
-    seq = vdtr.get_seq(id)
+    seq = stdan.get_seq(id)
     plt.savefig(os.path.join(savepath, seq + '.png'), transparent=False, dpi=300, bbox_inches='tight')

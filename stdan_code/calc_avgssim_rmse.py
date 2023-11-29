@@ -13,10 +13,8 @@ Calculate the average SSIM and RMSE for n frames
 
 '''
 # # video '000' to '019'
-# exp_name = 'STDAN_Stack_BSD_3ms24ms_best-ckpt'
-# exp_path = os.path.join(os.environ['HOME'], 'STDAN', 'exp_log', 'test', exp_name)
 
-exp_name = '20231124_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0455'
+exp_name = '20231129_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0905'
 exp_path = os.path.join('..', '..', 'STDAN_modified', 'exp_log', 'test', exp_name)
 
 csv_list = sorted(glob.glob(os.path.join(exp_path, 'SSIM_csv', '*.csv')))
