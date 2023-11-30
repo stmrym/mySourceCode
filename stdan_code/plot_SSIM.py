@@ -48,14 +48,14 @@ for id in range(stdan.num_csv):
     ### plot SSIM graph ###
 
 
-    fig = plt.figure(figsize=(7,4), dpi=300)
+    fig = plt.figure(figsize=(7,3), dpi=300)
     ax = fig.add_subplot()
 
-    ax.set_xlim([0,99])
+    ax.set_xlim([0,149])
     #ax.set_ylim([0.945,0.99])
     ax.set_xlabel('frame', fontsize=12)
     ax.set_ylabel('SSIM', fontsize=12)
-    ax.set_xticks(np.arange(0,100, step=10))
+    ax.set_xticks(np.arange(0,150, step=10))
 
 
     # vdtr.plot(id=id, frame=frame, col_name='VDTR', color='black', label='VDTR')
@@ -64,7 +64,8 @@ for id in range(stdan.num_csv):
 
 
     #ax.legend(loc='lower center', ncol=4) 
-    ax.legend(loc='upper center', bbox_to_anchor=(.5, -.20), ncol=3)
+    #ax.legend(loc='upper center', bbox_to_anchor=(.5, -.20), ncol=3)
+    ax.legend() 
     plt.tight_layout()
 
     
