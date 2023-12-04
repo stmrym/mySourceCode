@@ -3,8 +3,8 @@ import os
 import glob
 from tqdm import tqdm
 
-mode = 'output'
-exp_name = '20231129_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0905'
+mode = 'input'
+exp_name = '20231124_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0455'
 dataset_path = '../dataset/BSD_3ms24ms'
 
 if mode == 'input':

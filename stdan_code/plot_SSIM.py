@@ -33,10 +33,10 @@ class dataFrame():
         ax.plot(frame, self.df[col_name], c=color, ls='-', lw=1.5, alpha=1, label=label)
 
         
-# vdtr = dataFrame(exp_path = os.path.join('..', '..', 'VDTR_result', 'csv_SSIM'))
-stdan = dataFrame(exp_path = os.path.join('..', '..', 'STDAN_modified', 'exp_log', 'test', '20231129_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0905', 'SSIM_csv'))
+vdtr = dataFrame(exp_path = os.path.join('..', '..', 'VDTR_result', 'csv_SSIM'))
+stdan = dataFrame(exp_path = os.path.join('..', '..', 'STDAN_modified', 'exp_log', 'test', '20231124_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0455', 'SSIM_csv'))
 
-savepath = os.path.join('..', '..', 'STDAN_modified', 'exp_log', 'test', '20231129_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0905', 'SSIM_graph')
+savepath = os.path.join('..', '..', 'STDAN_modified', 'exp_log', 'test', '20231124_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0455', 'SSIM_graph')
 
 if not os.path.isdir(savepath):
     os.makedirs(savepath, exist_ok=True)
@@ -58,12 +58,12 @@ for id in range(stdan.num_csv):
     ax.set_xticks(np.arange(0,150, step=10))
 
 
-    # vdtr.plot(id=id, frame=frame, col_name='VDTR', color='black', label='VDTR')
-    # vdtr.plot(id=id, frame=frame, col_name='C_T10K', color='tab:blue', label='VDTR + Temopral (Proposed)')
+    vdtr.plot(id=id, frame=frame, col_name='VDTR', color='black', label='VDTR')
+    vdtr.plot(id=id, frame=frame, col_name='C_T10K', color='tab:blue', label='VDTR + Temp.')
     stdan.plot(id=id, frame=frame, col_name='output', color='tab:red', label='STDAN')
 
 
-    #ax.legend(loc='lower center', ncol=4) 
+    # ax.legend(loc='lower left', ncol=4) 
     #ax.legend(loc='upper center', bbox_to_anchor=(.5, -.20), ncol=3)
     ax.legend() 
     plt.tight_layout()
