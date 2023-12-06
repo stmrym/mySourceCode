@@ -1,3 +1,4 @@
+import argparse
 import glob
 import numpy as np
 import os
@@ -14,7 +15,12 @@ Calculate the average SSIM and RMSE for n frames
 '''
 # # video '000' to '019'
 
-exp_name = '20231129_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0905'
+parser = argparse.ArgumentParser(description='make ssim.csv file from test results.')
+
+parser.add_argument('exp_name', help="e.g., 20231129_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0905")
+args = parser.parse_args()
+
+exp_name = args.exp_name
 exp_path = os.path.join('..', '..', 'STDAN_modified', 'exp_log', 'test', exp_name)
 
 csv_list = sorted(glob.glob(os.path.join(exp_path, 'SSIM_csv', '*.csv')))

@@ -1,4 +1,5 @@
 import numpy as np
+import argparse
 import glob
 import os
 import math
@@ -21,6 +22,14 @@ calculating SSIMs of all test video sequences
 
 [Output]: SSIM .csv files of each video sequence  (./SSIM_csv/xxx.csv)
 '''
+
+parser = argparse.ArgumentParser(description='make ssim.csv file from test results.')
+
+parser.add_argument('exp_name', help="e.g., 20231129_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0905")
+parser.add_argument('--gt_path', help="e.g., ../../dataset/BSD3ms24ms/test", default='../../dataset/BSD_3ms24ms/test')
+
+args = parser.parse_args()
+
 
 # calculate convolution (for LPF)
 def valid_convolve(xx, size):
@@ -60,8 +69,8 @@ class Calc_SSIM():
     def calc_LPF(self):
         self.ssim_LPF_list = valid_convolve(self.ssim_list, self.filter_size)
 
-exp_name = '20231129_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0905'
-gt_path = os.path.join('..', '..', 'dataset', 'BSD_3ms24ms', 'test')
+exp_name = args.exp_name
+gt_path = args.gt_path
 base_path = os.path.join('..', '..', 'STDAN_modified', 'exp_log', 'test', exp_name)
 output_path = os.path.join(base_path, 'output')
 
@@ -74,11 +83,11 @@ for seq in seq_list:
     output = Calc_SSIM(fdir = os.path.join(output_path, seq))
     gt.files = gt.files[2:-2]
 
-    assert len(gt.files) == len(output.files), "len(gt), len(output) don't match"
+    assert len(gt.files) == len(output.files), f"len(gt)={len(gt.files)}, len(output)={len(output.files)} don't match"
 
     for gt_file, output_file in tqdm(zip(gt.files, output.files)):
         
-        assert os.path.basename(gt_file) == os.path.basename(output_file), "basenames don't match"
+        assert os.path.basename(gt_file) == os.path.basename(output_file), f"basenames gt_file={os.path.basename(gt_file)} don't match"
         
         gt.road_img(gt_file)
         output.road_img(output_file)
@@ -101,4 +110,5 @@ for seq in seq_list:
         os.makedirs(save_path, exist_ok=True)
 
     df.to_csv(os.path.join(save_path, seq + '.csv'), index=False) # save to .csv
+    print(f'saved {os.path.join(save_path, seq + ".csv")}')
 

@@ -1,11 +1,19 @@
 from PIL import Image
+import argparse
 import os
 import glob
 from tqdm import tqdm
 from pygifsicle import gifsicle
 
-mode = 'seg'
-exp_name = '20231129_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0905'
+parser = argparse.ArgumentParser(description='create STDAN output gif file.')
+
+parser.add_argument('mode', help="'seg', 'output'")
+parser.add_argument('exp_name', help="'STDAN_modified/exp_log/test/<exp_name>'")
+
+args = parser.parse_args()
+
+mode = args.mode
+exp_name = args.exp_name
 
 if mode in ['output', 'seg']:
     path = '../../STDAN_modified/exp_log/test/' + exp_name
@@ -47,4 +55,5 @@ for file_type in file_type_list:
         pictures[0].save(os.path.join(gif_path, seq + '.gif'),save_all=True, append_images=pictures[1:], optimize=True, loop=0)
 
         gifsicle(sources=os.path.join(gif_path, seq + '.gif'), destination=os.path.join(gif_path, seq + '.gif') ,optimize=False,colors=256,options=["--optimize=3"])
+        print(f'saved {os.path.join(gif_path, seq + ".gif")}')
 
