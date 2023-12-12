@@ -57,7 +57,7 @@ for seq in seq_list:
             os.makedirs(save_path, exist_ok=True)
 
         fig, ax = plt.subplots(dpi=300)
-        im = ax.imshow(diff_sum, cmap='jet')
+        im = ax.imshow(diff_sum, vmin=0, vmax=210, cmap='jet')
         ax.axis("off")
         divider = mpl_toolkits.axes_grid1.make_axes_locatable(ax)
         cax = divider.append_axes('right', '5%', pad='3%')
