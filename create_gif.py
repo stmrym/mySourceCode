@@ -4,34 +4,27 @@ import glob
 from tqdm import tqdm
 from pygifsicle import gifsicle
 
-path = '../datasets/BSD_3ms24ms'
-file_type_list = ['Blur', 'Sharp']
+# path = '../STDAN_modified/exp_log/test/20231129_STDAN_Stack_night_blur_ckpt-epoch-0050/mmflow_npy/001'
+# savename = '../STDAN_modified/exp_log/test/20231129_STDAN_Stack_night_blur_ckpt-epoch-0050/mmflow_npy.gif'
+# path = '../dataset/night_blur_resized/test/input/001'
+# savename = '../dataset/night_blur_resized/test/001.gif'
+path = '../Tracking-Anything-with-DEVA/example/output/Visualizations'
+savename = '../Tracking-Anything-with-DEVA/example/output/Visualizations.gif'
 
-for file_type in file_type_list:
+file_list = sorted(glob.glob(os.path.join(path, '*.png')))
+file_list = file_list[2:-3]
 
-    gif_path = os.path.join(path, 'gif', file_type)
+pictures = []
 
-    if not os.path.exists(gif_path):
-        os.makedirs(gif_path)
+for file in file_list:
+    img = Image.open(file).quantize()
+    # img_resize = img.resize((img.width//2, img.height//2))
+    pictures.append(img)
 
-    seq_list = sorted(os.listdir(os.path.join(path, 'test')))
 
-    for seq in tqdm(seq_list):
 
-        pictures = []
+pictures[0].save(savename,save_all=True, append_images=pictures[1:], optimize=True, loop=0)
 
-        file_list = sorted(glob.glob(os.path.join(path, 'test', seq, file_type, 'RGB', '*.png')))
-        file_list = file_list[2:-2]
-
-        for file in file_list:
-            img = Image.open(file).quantize()
-            img_resize = img.resize((img.width//2, img.height//2))
-            pictures.append(img_resize)
-        
-        
-
-        pictures[0].save(os.path.join(gif_path, seq + '.gif'),save_all=True, append_images=pictures[1:], optimize=True, loop=0)
-
-        gifsicle(sources=os.path.join(gif_path, seq + '.gif'), destination=os.path.join(gif_path, seq + '.gif') ,optimize=False,colors=256,options=["--optimize=3"]
+gifsicle(sources=savename, destination=savename ,optimize=False,colors=256,options=["--optimize=3"]
 )
 
