@@ -71,7 +71,7 @@ class Calc_SSIM():
 
 exp_name = args.exp_name
 gt_path = args.gt_path
-base_path = os.path.join('..', '..', 'STDAN_modified', 'exp_log', 'test', exp_name)
+base_path = os.path.join('..', '..', 'STDAN_modified', exp_name)
 output_path = os.path.join(base_path, 'output')
 
 seq_list = [f for f in sorted(os.listdir(output_path)) if os.path.isdir(os.path.join(output_path, f))]
