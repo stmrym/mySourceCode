@@ -17,13 +17,12 @@ Calculate the average SSIM and RMSE for n frames
 
 parser = argparse.ArgumentParser(description='make ssim.csv file from test results.')
 
-parser.add_argument('exp_name', help="e.g., 20231129_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0905")
+parser.add_argument('--exp_dir', required = True, help="e.g., 20231129_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0905")
+parser.add_argument('--save_name', required = True, help="e.g., epoch-0905")
+
 args = parser.parse_args()
 
-exp_name = args.exp_name
-exp_path = os.path.join('..', '..', 'STDAN_modified', 'exp_log', 'test', exp_name)
-
-csv_list = sorted(glob.glob(os.path.join(exp_path, 'SSIM_csv', '*.csv')))
+csv_list = sorted(glob.glob(os.path.join(args.exp_dir, 'SSIM_csv', '*.csv')))
 seq_list = [os.path.splitext(os.path.basename(f))[0] for f in csv_list]
 
 avg_df = pd.DataFrame({
@@ -46,7 +45,6 @@ for row_id, csv_file in enumerate(csv_list):
 
     
     
-print(avg_df)
 
 # calculate average from seqs
 avg_df.loc['Average', 'avgSSIM'] = avg_df['avgSSIM'].mean()
@@ -54,4 +52,4 @@ avg_df.loc['Average', 'RMSE'] = avg_df['RMSE'].mean()
 
 print(avg_df)
 
-avg_df.to_csv(os.path.join(exp_path, 'average.csv'), index=False) # save to .csv
+avg_df.to_csv(os.path.join(args.exp_dir, args.save_name + '.csv'), index=False) # save to .csv

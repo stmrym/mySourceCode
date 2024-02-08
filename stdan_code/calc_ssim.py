@@ -25,8 +25,9 @@ calculating SSIMs of all test video sequences
 
 parser = argparse.ArgumentParser(description='make ssim.csv file from test results.')
 
-parser.add_argument('exp_name', help="e.g., 20231129_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0905")
-parser.add_argument('--gt_path', help="e.g., ../../dataset/BSD3ms24ms/test", default='../../dataset/BSD_3ms24ms/test')
+parser.add_argument('--output_path', required = True, help="e.g., ./exp_log/20231129_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0905/visualization/epoch-0200")
+parser.add_argument('--save_dir', required = True, help="e.g., ./exp_log/20231129_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0905")
+parser.add_argument('--gt_path', required = True, nargs='+', help="e.g., ../../dataset/BSD3ms24ms/test ../../dataset/GOPRO_Large/test")
 
 args = parser.parse_args()
 
@@ -69,20 +70,29 @@ class Calc_SSIM():
     def calc_LPF(self):
         self.ssim_LPF_list = valid_convolve(self.ssim_list, self.filter_size)
 
-exp_name = args.exp_name
-gt_path = args.gt_path
-base_path = os.path.join('..', '..', 'STDAN_modified', exp_name)
-output_path = os.path.join(base_path, 'output')
 
-seq_list = [f for f in sorted(os.listdir(output_path)) if os.path.isdir(os.path.join(output_path, f))]
+
+seq_list = [f for f in sorted(os.listdir(args.output_path)) if os.path.isdir(os.path.join(args.output_path, f))]
 
 for seq in seq_list:
         
     print(seq)
-    gt = Calc_SSIM(fdir = os.path.join(gt_path, seq, 'Sharp', 'RGB'))
-    output = Calc_SSIM(fdir = os.path.join(output_path, seq))
+    for gt_path in args.gt_path:
+        if os.path.isdir(os.path.join(gt_path, seq, 'sharp')):
+            gt = Calc_SSIM(fdir = os.path.join(gt_path, seq, 'sharp'))
+            print(os.path.join(gt_path, seq, 'sharp'))
+            break
+        if os.path.isdir(os.path.join(gt_path, seq, 'Sharp', 'RGB')):
+            gt = Calc_SSIM(fdir = os.path.join(gt_path, seq, 'Sharp', 'RGB'))
+            print(os.path.join(gt_path, seq, 'Sharp', 'RGB'))
+            break
+
+
+    output = Calc_SSIM(fdir = os.path.join(args.output_path, seq))
     gt.files = gt.files[2:-2]
 
+    assert len(output.files) != 0, f'len(output)={len(output.files)}'
+    assert len(gt.files) != 0, f'len(gt)={len(gt.files)}'
     assert len(gt.files) == len(output.files), f"len(gt)={len(gt.files)}, len(output)={len(output.files)} don't match"
 
     for gt_file, output_file in tqdm(zip(gt.files, output.files)):
@@ -104,8 +114,7 @@ for seq in seq_list:
                 }
     )
 
-    save_path = os.path.join(base_path,'SSIM_csv')
-    # save_path = os.path.join(os.environ['HOME'], 'STDAN', 'exp_log', 'test', exp_name,'SSIM_csv')
+    save_path = os.path.join(args.save_dir,'SSIM_csv')
     if not os.path.isdir(save_path):
         os.makedirs(save_path, exist_ok=True)
 

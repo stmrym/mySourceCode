@@ -33,41 +33,42 @@ class dataFrame():
         ax.plot(frame, self.df[col_name], c=color, ls='-', lw=1.5, alpha=1, label=label)
 
         
-vdtr = dataFrame(exp_path = os.path.join('..', '..', 'VDTR_result', 'csv_SSIM'))
-stdan = dataFrame(exp_path = os.path.join('..', '..', 'STDAN_modified', 'exp_log', 'test', '20231124_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0455', 'SSIM_csv'))
+wo_edge = dataFrame(exp_path = '../../STDAN_modified/exp_log/train/WO_Motion_2024-01-16T103421_STDAN_Stack_BSD_3ms24ms_GOPRO/visualization/epoch-0350/SSIM_csv')
+w_edge = dataFrame(exp_path = '../../STDAN_modified/exp_log/train/W_Motion_2024-02-01T094737_STDAN_Stack_BSD_3ms24ms_GOPRO/visualization/epoch-0600/SSIM_csv')
 
-savepath = os.path.join('..', '..', 'STDAN_modified', 'exp_log', 'test', '20231124_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0455', 'SSIM_graph')
+savepath = '../../STDAN_modified/debug_results'
 
 if not os.path.isdir(savepath):
     os.makedirs(savepath, exist_ok=True)
 
 
-for id in range(stdan.num_csv):
+for id in range(wo_edge.num_csv):
 
-    frame = stdan.get_frame(id)
+    frame = wo_edge.get_frame(id)
     ### plot SSIM graph ###
 
 
     fig = plt.figure(figsize=(7,3), dpi=300)
     ax = fig.add_subplot()
 
-    ax.set_xlim([0,149])
+    # ax.set_xlim([0,149])
     #ax.set_ylim([0.945,0.99])
     ax.set_xlabel('frame', fontsize=12)
     ax.set_ylabel('SSIM', fontsize=12)
-    ax.set_xticks(np.arange(0,150, step=10))
 
-
-    vdtr.plot(id=id, frame=frame, col_name='VDTR', color='black', label='VDTR')
-    vdtr.plot(id=id, frame=frame, col_name='C_T10K', color='tab:blue', label='VDTR + Temp.')
-    stdan.plot(id=id, frame=frame, col_name='output', color='tab:red', label='STDAN')
+    wo_edge.plot(id=id, frame=frame, col_name='output', color='tab:green', label='Epoch 0350')
+    w_edge.plot(id=id, frame=frame, col_name='output', color='tab:orange', label='Epoch 0600')
 
 
     # ax.legend(loc='lower left', ncol=4) 
     #ax.legend(loc='upper center', bbox_to_anchor=(.5, -.20), ncol=3)
+    ax.minorticks_on()
+    ax.grid(which = "both", axis="x")
+    ax.grid(axis='y')
     ax.legend() 
     plt.tight_layout()
 
     
-    seq = stdan.get_seq(id)
+    seq = wo_edge.get_seq(id)
     plt.savefig(os.path.join(savepath, seq + '.png'), transparent=False, dpi=300, bbox_inches='tight')
+    plt.close()

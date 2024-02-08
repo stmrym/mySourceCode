@@ -4,15 +4,12 @@ import glob
 from tqdm import tqdm
 from pygifsicle import gifsicle
 
-# path = '../STDAN_modified/exp_log/test/20231129_STDAN_Stack_night_blur_ckpt-epoch-0050/mmflow_npy/001'
-# savename = '../STDAN_modified/exp_log/test/20231129_STDAN_Stack_night_blur_ckpt-epoch-0050/mmflow_npy.gif'
-# path = '../dataset/night_blur_resized/test/input/001'
-# savename = '../dataset/night_blur_resized/test/001.gif'
-path = '../Tracking-Anything-with-DEVA/example/output/Visualizations'
-savename = '../Tracking-Anything-with-DEVA/example/output/Visualizations.gif'
+
+path = '../STDAN_modified/exp_log/train/20231221_2023-12-21T185537_STDAN_Stack_BSD_3ms24ms_GOPRO/visualization/BSD_3ms24ms/epoch-0700/output/027'
+savename = '../STDAN_modified/exp_log/train/20231221_2023-12-21T185537_STDAN_Stack_BSD_3ms24ms_GOPRO/visualization/BSD_3ms24ms/epoch-0700/output/027.gif'
 
 file_list = sorted(glob.glob(os.path.join(path, '*.png')))
-file_list = file_list[2:-3]
+# file_list = file_list[2:-3]
 
 pictures = []
 
