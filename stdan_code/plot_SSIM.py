@@ -3,6 +3,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+from matplotlib.ticker import MaxNLocator
 
 '''
 plot SSIM graph
@@ -33,10 +34,10 @@ class dataFrame():
         ax.plot(frame, self.df[col_name], c=color, ls='-', lw=1.5, alpha=1, label=label)
 
         
-wo_edge = dataFrame(exp_path = '../../STDAN_modified/exp_log/train/WO_Motion_2024-01-16T103421_STDAN_Stack_BSD_3ms24ms_GOPRO/visualization/epoch-0350/SSIM_csv')
-w_edge = dataFrame(exp_path = '../../STDAN_modified/exp_log/train/W_Motion_2024-02-01T094737_STDAN_Stack_BSD_3ms24ms_GOPRO/visualization/epoch-0600/SSIM_csv')
+wo_edge = dataFrame(exp_path = '../../STDAN_modified/exp_log/train/WO_Motion_small_2024-02-08T161225_STDAN_Stack_BSD_3ms24ms_GOPRO/visualization/epoch-1000_output/SSIM_csv')
+w_edge = dataFrame(exp_path = '../../STDAN_modified/exp_log/train/W_Motion_small_e600_required_True_2024-02-14T112105_STDAN_Stack_BSD_3ms24ms_GOPRO/visualization/epoch-1000_output/SSIM_csv')
 
-savepath = '../../STDAN_modified/debug_results'
+savepath = '../../STDAN_modified/debug_results/20240222'
 
 if not os.path.isdir(savepath):
     os.makedirs(savepath, exist_ok=True)
@@ -56,8 +57,8 @@ for id in range(wo_edge.num_csv):
     ax.set_xlabel('frame', fontsize=12)
     ax.set_ylabel('SSIM', fontsize=12)
 
-    wo_edge.plot(id=id, frame=frame, col_name='output', color='tab:green', label='Epoch 0350')
-    w_edge.plot(id=id, frame=frame, col_name='output', color='tab:orange', label='Epoch 0600')
+    wo_edge.plot(id=id, frame=frame, col_name='output', color='tab:green', label='w/o Edge Loss')
+    w_edge.plot(id=id, frame=frame, col_name='output', color='tab:orange', label='w/ Edge Loss')
 
 
     # ax.legend(loc='lower left', ncol=4) 
@@ -66,6 +67,7 @@ for id in range(wo_edge.num_csv):
     ax.grid(which = "both", axis="x")
     ax.grid(axis='y')
     ax.legend() 
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
     plt.tight_layout()
 
     

@@ -25,7 +25,7 @@ calculating SSIMs of all test video sequences
 
 parser = argparse.ArgumentParser(description='make ssim.csv file from test results.')
 
-parser.add_argument('--output_path', required = True, help="e.g., ./exp_log/20231129_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0905/visualization/epoch-0200")
+parser.add_argument('--output_path', required = True, help="e.g., ./exp_log/WO_Motion_small_2024-02-08T161225_STDAN_Stack_BSD_3ms24ms_GOPRO/visualization/epoch-0200")
 parser.add_argument('--save_dir', required = True, help="e.g., ./exp_log/20231129_STDAN_Stack_BSD_3ms24ms_ckpt-epoch-0905")
 parser.add_argument('--gt_path', required = True, nargs='+', help="e.g., ../../dataset/BSD3ms24ms/test ../../dataset/GOPRO_Large/test")
 
@@ -48,9 +48,8 @@ def valid_convolve(xx, size):
 
 
 class Calc_SSIM():
-    def __init__(self, fdir):
-        self.fdir = fdir
-        self.files = sorted(glob.glob(os.path.join(self.fdir, '*.png')))
+    def __init__(self, file_paths):
+        self.files = file_paths
         self.ssim_list = []
         self.ssim_LPF_list = []
         self.filter_size = 3
@@ -77,19 +76,21 @@ seq_list = [f for f in sorted(os.listdir(args.output_path)) if os.path.isdir(os.
 for seq in seq_list:
         
     print(seq)
+
+    output_frame_list = [f.split('/')[-1] for f in sorted(glob.glob(os.path.join(args.output_path, seq, '*.png')))]
+
     for gt_path in args.gt_path:
+        #  GOPRO
         if os.path.isdir(os.path.join(gt_path, seq, 'sharp')):
-            gt = Calc_SSIM(fdir = os.path.join(gt_path, seq, 'sharp'))
-            print(os.path.join(gt_path, seq, 'sharp'))
-            break
-        if os.path.isdir(os.path.join(gt_path, seq, 'Sharp', 'RGB')):
-            gt = Calc_SSIM(fdir = os.path.join(gt_path, seq, 'Sharp', 'RGB'))
-            print(os.path.join(gt_path, seq, 'Sharp', 'RGB'))
-            break
+            gt_frame_list = [os.path.join(gt_path, seq, 'sharp', output_frame) for output_frame in output_frame_list]
+
+        # BSD_3ms24ms
+        elif os.path.isdir(os.path.join(gt_path, seq, 'Sharp', 'RGB')):
+            gt_frame_list = [os.path.join(gt_path, seq, 'Sharp', 'RGB', output_frame) for output_frame in output_frame_list]
 
 
-    output = Calc_SSIM(fdir = os.path.join(args.output_path, seq))
-    gt.files = gt.files[2:-2]
+    output = Calc_SSIM(file_paths = sorted(glob.glob(os.path.join(args.output_path, seq, '*.png'))))
+    gt = Calc_SSIM(file_paths = gt_frame_list)
 
     assert len(output.files) != 0, f'len(output)={len(output.files)}'
     assert len(gt.files) != 0, f'len(gt)={len(gt.files)}'
