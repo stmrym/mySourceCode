@@ -35,9 +35,10 @@ class dataFrame():
 
         
 wo_edge = dataFrame(exp_path = '../../STDAN_modified/exp_log/train/WO_Motion_small_2024-02-08T161225_STDAN_Stack_BSD_3ms24ms_GOPRO/visualization/epoch-1000_output/SSIM_csv')
-w_edge = dataFrame(exp_path = '../../STDAN_modified/exp_log/train/W_Motion_small_e600_required_True_2024-02-14T112105_STDAN_Stack_BSD_3ms24ms_GOPRO/visualization/epoch-1000_output/SSIM_csv')
+w_edge = dataFrame(exp_path = '../../STDAN_modified/exp_log/train/W_Orthogonal_small_e600_required_True_2024-02-22T112409_STDAN_Stack_BSD_3ms24ms_GOPRO/visualization/epoch-1000_output/SSIM_csv')
 
-savepath = '../../STDAN_modified/debug_results/20240222'
+savepath = '../../STDAN_modified/debug_results/20240306'
+
 
 if not os.path.isdir(savepath):
     os.makedirs(savepath, exist_ok=True)
