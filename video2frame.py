@@ -15,11 +15,13 @@ def save_all_frames(video_path, dir_path, ext='png'):
         ret, frame = cap.read() 
         # frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
         if ret:
-            if n % 2 == 0:
-                frame = cv2.resize(frame, None, fx=0.5, fy=0.5)
-                cv2.imwrite(f'{dir_path}/{str(n//2).zfill(3)}.{ext}', frame)
+            # if n % 2 == 0:
+            # frame = cv2.resize(frame, None, fx=0.5, fy=0.5)
+            frame = frame[180:900, 320:1600, :]
+            cv2.imwrite(f'{dir_path}/{str(n).zfill(5)}.{ext}', frame)
             n += 1
         else:
             return
 
-save_all_frames('../dataset/raw_video/3.mp4', '../dataset/raw_video/3_15fps_resized')
+if __name__ == '__main__':
+    save_all_frames('/mnt/d/Chronos/vid_2025-03-06_22-25-03.mp4', '/mnt/d/Chronos/004')
