@@ -46,4 +46,4 @@ def averaging_frames(frame_dir_path, blur_dir_path, sharp_dir_path, avg_step, ex
 
 
 if __name__ == '__main__':
-    averaging_frames('/mnt/d/Chronos/005', '/mnt/d/dataset/chronos/005/blur', '/mnt/d/dataset/chronos/005/sharp', avg_step=61, ext='dng')
+    averaging_frames('/mnt/d/Chronos/008', '/mnt/d/dataset/chronos/008/blur', '/mnt/d/dataset/chronos/008/sharp', avg_step=15)
