@@ -27,6 +27,7 @@ seq_list = [os.path.splitext(os.path.basename(f))[0] for f in csv_list]
 
 avg_df = pd.DataFrame({
     'seq': seq_list,
+    'avgPSNR': np.zeros(len(seq_list)),
     'avgSSIM': np.zeros(len(seq_list)),
     'RMSE': np.zeros(len(seq_list))
 })
@@ -34,6 +35,10 @@ avg_df = pd.DataFrame({
 for row_id, csv_file in enumerate(csv_list):
 
     df = pd.read_csv(csv_file)
+
+    # calculate the average SSIM
+    psnr_mean_series = df.loc[: , 'output_PSNR'].mean()  # calculate average SSIM from 'output' 
+    avg_df.loc[row_id, 'avgPSNR'] = psnr_mean_series 
 
     # calculate the average SSIM
     ssim_mean_series = df.loc[: , 'output'].mean()  # calculate average SSIM from 'output' 
@@ -47,6 +52,7 @@ for row_id, csv_file in enumerate(csv_list):
     
 
 # calculate average from seqs
+avg_df.loc['Average', 'avgPSNR'] = avg_df['avgPSNR'].mean()
 avg_df.loc['Average', 'avgSSIM'] = avg_df['avgSSIM'].mean()
 avg_df.loc['Average', 'RMSE'] = avg_df['RMSE'].mean()
 

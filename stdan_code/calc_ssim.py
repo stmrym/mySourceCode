@@ -50,6 +50,7 @@ def valid_convolve(xx, size):
 class Calc_SSIM():
     def __init__(self, file_paths):
         self.files = file_paths
+        self.psnr_list = []
         self.ssim_list = []
         self.ssim_LPF_list = []
         self.filter_size = 3
@@ -60,12 +61,14 @@ class Calc_SSIM():
         self.h, self.w = self.image.shape
         self.image = cv2.resize(self.image, (self.w // self.resize_ratio, self.h // self.resize_ratio), interpolation=cv2.INTER_AREA)   
 
-    def road_img(self, img_path):  # for Single Image Reflection Removal (SIRR) results (Zhang et al.)
+    def load_img(self, img_path):  # for Single Image Reflection Removal (SIRR) results (Zhang et al.)
         self.image = cv2.cvtColor(cv2.imread(img_path), cv2.COLOR_BGR2GRAY)
 
     def append_ssim(self, GT_image):
         self.ssim_list.append(ssim(GT_image, self.image))
 
+    def append_psnr(self, GT_image):
+        self.psnr_list.append(cv2.PSNR(GT_image, self.image))
     def calc_LPF(self):
         self.ssim_LPF_list = valid_convolve(self.ssim_list, self.filter_size)
 
@@ -100,16 +103,17 @@ for seq in seq_list:
         
         assert os.path.basename(gt_file) == os.path.basename(output_file), f"basenames gt_file={os.path.basename(gt_file)} don't match"
         
-        gt.road_img(gt_file)
-        output.road_img(output_file)
+        gt.load_img(gt_file)
+        output.load_img(output_file)
+        output.append_psnr(gt.image)
         output.append_ssim(gt.image)
 
         output.calc_LPF()
-
     frame = [os.path.splitext(os.path.basename(f))[0] for f in gt.files]
 
     df = pd.DataFrame(
         data={  'frame'             :   frame,
+                'output_PSNR'       :   output.psnr_list,
                 'output'            :   output.ssim_list,
                 'output_LPF'        :   output.ssim_LPF_list,
                 }

@@ -34,10 +34,13 @@ class dataFrame():
         ax.plot(frame, self.df[col_name], c=color, ls='-', lw=1.5, alpha=1, label=label)
 
         
-wo_edge = dataFrame(exp_path = '../../STDAN_modified/exp_log/train/WO_Motion_small_2024-02-08T161225_STDAN_Stack_BSD_3ms24ms_GOPRO/visualization/epoch-1000_output/SSIM_csv')
-w_edge = dataFrame(exp_path = '../../STDAN_modified/exp_log/train/W_Orthogonal_small_e600_required_True_2024-02-22T112409_STDAN_Stack_BSD_3ms24ms_GOPRO/visualization/epoch-1000_output/SSIM_csv')
+# wo_edge = dataFrame(exp_path = '../../STDAN_modified/exp_log/train/WO_Motion_small_2024-02-08T161225_STDAN_Stack_BSD_3ms24ms_GOPRO/visualization/epoch-0900_output/SSIM_csv')
+# w_edge = dataFrame(exp_path = '../../STDAN_modified/exp_log/train/F_2024-03-12T112710_ESTDAN_light_Stack_BSD_3ms24ms_GOPRO/visualization/epoch-0900_output/SSIM_csv')
 
-savepath = '../../STDAN_modified/debug_results/20240306'
+wo_edge = dataFrame(exp_path = '../../STDAN_modified/exp_log/test/WO_Motion_small_2024-02-08T161225_STDAN_Stack_BSD_3ms24ms_GOPRO_ckpt-epoch-0900/SSIM_csv')
+w_edge = dataFrame(exp_path = '../../STDAN_modified/exp_log/test/F_2024-03-12T112710_ESTDAN_light_Stack_BSD_3ms24ms_GOPRO_ckpt-epoch-0900/SSIM_csv')
+
+savepath = '../../STDAN_modified/debug_results/20240322'
 
 
 if not os.path.isdir(savepath):
@@ -50,7 +53,7 @@ for id in range(wo_edge.num_csv):
     ### plot SSIM graph ###
 
 
-    fig = plt.figure(figsize=(7,3), dpi=300)
+    fig = plt.figure(figsize=(11,4), dpi=300)
     ax = fig.add_subplot()
 
     # ax.set_xlim([0,149])
@@ -58,8 +61,8 @@ for id in range(wo_edge.num_csv):
     ax.set_xlabel('frame', fontsize=12)
     ax.set_ylabel('SSIM', fontsize=12)
 
-    wo_edge.plot(id=id, frame=frame, col_name='output', color='tab:green', label='w/o Edge Loss')
-    w_edge.plot(id=id, frame=frame, col_name='output', color='tab:orange', label='w/ Edge Loss')
+    wo_edge.plot(id=id, frame=frame, col_name='output', color='tab:blue', label='STDANet')
+    w_edge.plot(id=id, frame=frame, col_name='output', color='tab:red', label='ESTDANet')
 
 
     # ax.legend(loc='lower left', ncol=4) 
