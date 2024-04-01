@@ -22,6 +22,7 @@ parser.add_argument('--save_name', required = True, help="e.g., epoch-0905")
 
 args = parser.parse_args()
 
+
 csv_list = sorted(glob.glob(os.path.join(args.exp_dir, 'SSIM_csv', '*.csv')))
 seq_list = [os.path.splitext(os.path.basename(f))[0] for f in csv_list]
 
