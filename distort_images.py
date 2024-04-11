@@ -46,8 +46,7 @@ def change_constrast(img, alpha=1, beta=0):
     return dst_img
 
 
-def add_gaussian_noise(img, sigma, mu=0):
-    noise = np.random.normal(0, sigma, img.shape)
+def add_noise(img, noise):
     dst_img = img.astype(np.float32) + noise
     dst_img = np.clip(dst_img, 0, 255).astype(np.uint8)
     return dst_img
@@ -56,34 +55,36 @@ def add_gaussian_noise(img, sigma, mu=0):
 
 def main():
 
-    path = '/mnt/d/dataset/chronos/004/blur/00060.png'
-    out_name = 'test4'
+
+    path = '/mnt/d/results/20240410/F_a05_00092.png'
+    out_name = 'F_a05TOa1_00092.png'
     
     img = cv2.imread(path).astype(np.float32)
 
-    alpha = 0.5
+    alpha = 1/0.5
     beta = 0
+    sigma = 20
 
     # img_yuv = cv2.cvtColor(img, cv2.COLOR_BGR2YUV)
     # plot_hist(img_yuv.reshape(-1,3), '/mnt/d/results/20240403/' + out_name + '_yuv_in_hist.png', ver='yuv')
-    plot_hist(img.reshape(-1,3), '/mnt/d/results/20240403/' + out_name + '_in_hist.png', ver='bgr')
+    # plot_hist(img.reshape(-1,3), '/mnt/d/results/20240403/' + out_name + '_in_hist.png', ver='bgr')
 
 
     # img_yuv[:,:,0] = change_constrast(img_yuv[:,:,0], alpha=alpha, beta=beta)
     # dst_img = cv2.cvtColor(img_yuv, cv2.COLOR_YUV2BGR)
 
+    dst_img = change_constrast(img, alpha=alpha, beta=beta)
     
-    
-    # dst_img = change_constrast(img, alpha=alpha, beta=beta)
-    dst_img = add_gaussian_noise(img, sigma=30)
+    # noise = np.random.normal(0, sigma, img.shape)
+    # dst_img = add_noise(img, noise = noise)
 
 
 
 
     # dst_img_yuv = cv2.cvtColor(dst_img, cv2.COLOR_BGR2YUV)
-    cv2.imwrite('/mnt/d/results/20240403/' + out_name + 'dst.png', dst_img)
+    cv2.imwrite('/mnt/d/results/20240410/' + out_name, dst_img)
     # plot_hist(dst_img_yuv.reshape(-1,3), '/mnt/d/results/20240403/' + out_name + '_yuv_out_hist.png', ver='yuv')
-    plot_hist(dst_img.reshape(-1,3), '/mnt/d/results/20240403/' + out_name + '_out_hist.png', ver='bgr')
+    # plot_hist(dst_img.reshape(-1,3), '/mnt/d/results/20240403/' + out_name + '_out_hist.png', ver='bgr')
 
 if __name__ == '__main__':
     main()
