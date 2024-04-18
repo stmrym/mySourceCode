@@ -86,7 +86,8 @@ def apply_ccm(image, ccm):
 def safe_invert_gains(image, rgb_gain, red_gain, blue_gain):
     """Inverts gains while safely handling saturated pixels."""
     gains = torch.tensor([1.0 / red_gain, 1.0, 1.0 / blue_gain]) / rgb_gain
-    gains = gains[None, None, :]
+    gains = gains[None, None, None, :]
+    # gains = torch.view(gains)
     # Prevents dimming of saturated pixels by smoothly masking gains near white.
     gray = torch.mean(image, dim=-1, keepdim=True)
     inflection = 0.9
@@ -98,24 +99,30 @@ def safe_invert_gains(image, rgb_gain, red_gain, blue_gain):
 def mosaic(image):
     """Extracts RGGB Bayer planes from an RGB image."""
     shape = image.shape
-    red = image[0::2, 0::2, 0]
-    green_red = image[0::2, 1::2, 1]
-    green_blue = image[1::2, 0::2, 1]
-    blue = image[1::2, 1::2, 2]
+    red = image[:, 0::2, 0::2, 0]
+    green_red = image[:, 0::2, 1::2, 1]
+    green_blue = image[:, 1::2, 0::2, 1]
+    blue = image[:, 1::2, 1::2, 2]
     image = torch.stack((red, green_red, green_blue, blue), axis=-1)
-    image = torch.reshape(image, (shape[0] // 2, shape[1] // 2, 4))
+    image = torch.reshape(image, (-1, shape[1] // 2, shape[2] // 2, 4))
     return image
 
 
-def unprocess(image):
+def unprocess(image, random_ccm_tensor=None, random_gains_list=None):
     """Unprocesses an image from sRGB to realistic raw data."""
 
     # Randomly creates image metadata.
-    rgb2cam = random_ccm()
+    if random_ccm_tensor == None:
+        rgb2cam = random_ccm()
+    else:
+        rgb2cam = random_ccm_tensor
 
     cam2rgb = torch.linalg.inv(rgb2cam)
-    rgb_gain, red_gain, blue_gain = random_gains()
-
+    
+    if random_gains_list == None:
+        rgb_gain, red_gain, blue_gain = random_gains()
+    else:
+        rgb_gain, red_gain, blue_gain = random_gains_list
     # Approximately inverts global tone mapping.
     image = inverse_smoothstep(image)
     # Inverts gamma compression.
@@ -126,6 +133,7 @@ def unprocess(image):
     image = safe_invert_gains(image, rgb_gain, red_gain, blue_gain)
     # Clips saturated pixels.
     image = torch.clamp(image, min=0.0, max=1.0)
+
     # Applies a Bayer mosaic.
     image = mosaic(image)
 
