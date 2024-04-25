@@ -82,6 +82,8 @@ def apply_ccm(image, ccm):
     image = torch.tensordot(image, ccm, dims=[[-1], [-1]])
     return torch.reshape(image, shape)
 
+def change_constast(image, constast=1.0, brightness=0.0):
+    return (constast*image + brightness)
 
 def safe_invert_gains(image, rgb_gain, red_gain, blue_gain):
     """Inverts gains while safely handling saturated pixels."""
@@ -93,6 +95,7 @@ def safe_invert_gains(image, rgb_gain, red_gain, blue_gain):
     inflection = 0.9
     mask = (torch.maximum(gray - inflection, torch.tensor(0.0)) / (1.0 - inflection)) ** 2.0
     safe_gains = torch.maximum(mask + (1.0 - mask) * gains, gains)
+
     return image * safe_gains
 
 
@@ -108,9 +111,8 @@ def mosaic(image):
     return image
 
 
-def unprocess(image, random_ccm_tensor=None, random_gains_list=None):
+def unprocess(image, random_ccm_tensor=None, random_gains_list=None, contrast=1.0, brightness=0.0):
     """Unprocesses an image from sRGB to realistic raw data."""
-
     # Randomly creates image metadata.
     if random_ccm_tensor == None:
         rgb2cam = random_ccm()
@@ -127,8 +129,10 @@ def unprocess(image, random_ccm_tensor=None, random_gains_list=None):
     image = inverse_smoothstep(image)
     # Inverts gamma compression.
     image = gamma_expansion(image)
-    # Inverts color correction.
+    # # Inverts color correction.
     image = apply_ccm(image, rgb2cam)
+    # Change constrast before inverts WB
+    image = change_constast(image, contrast, brightness)
     # Approximately inverts white balance and brightening.
     image = safe_invert_gains(image, rgb_gain, red_gain, blue_gain)
     # Clips saturated pixels.
@@ -159,7 +163,6 @@ def random_noise_levels():
     read_noise = torch.exp(log_read_noise[0])
 
     return shot_noise, read_noise
-
 
 def add_noise(image, shot_noise=0.01, read_noise=0.0005):
     """Adds random shot (proportional to image) and read (independent) noise."""

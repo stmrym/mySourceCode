@@ -6,29 +6,29 @@ from torchvision import transforms
 from unprocess_torch import unprocess, random_noise_levels, add_noise
 from process_torch import process
 
-
-def change_constast(raw_image, a=1.0, b=0.0):
-    return a*raw_image + b
-
-def color_jitter(image, brightness=1.0, contrast=1.0, saturation=1.0, hue=1.0):
-    print(image.shape)
-    transform = transforms.ColorJitter(brightness=brightness, contrast=contrast, saturation=saturation, hue=hue)
-    return transform(image.permute(0,3,1,2)).permute(0,2,3,1)
+def save_from_tensor(image_tensor):
+    image_np = (image_tensor.numpy()*255).astype(np.uint8)
+    if image_np.shape[-1] == 4:
+        rggb = ['r', 'g1', 'g2', 'b']
+        for i in range(0, image_np.shape[-1]):
+            cv2.imwrite(f'/mnt/d/results/20240417/{fname}_{rggb[i]}.png', image_np[0,:,:,i])
 
 
-def add_raw_noise(np_image, random_ccm_tensor=None, random_gains_list=None, a=1.0, b=0.0, bright=1.0, contrast=1.0, saturation=1.0, hue=1.0):
+def add_raw_noise(np_image, random_ccm_tensor=None, random_gains_list=None, lambda_shot=None, lambda_read=None, contrast=1.0, brightness=0.0):
     # Input: np array normalized [0,1] of shape (b, h, w, c)
     # batch :0 becomes GT
     # batch :1 becomes noisy
     image = torch.tensor(np_image, dtype=torch.float32)
 
     # Unprocessing RGB -> Bayer
-    raw_image, metadata = unprocess(image, random_ccm_tensor, random_gains_list)
+    raw_image, metadata = unprocess(image, random_ccm_tensor, random_gains_list, contrast, brightness)
+
+    # Clips saturated pixels.
+    raw_image = torch.clamp(raw_image, min=0.0, max=1.0)  
     
-    # change contrast
-    raw_image = change_constast(raw_image, a, b)    
     # Add noise
-    lambda_shot, lambda_read = random_noise_levels()
+    if lambda_read == None or lambda_shot == None:
+        lambda_shot, lambda_read = random_noise_levels()
     batch = raw_image.shape[0]
     if batch == 1:
         noise_image = add_noise(raw_image[0,:,:,:], lambda_shot, lambda_read)
@@ -43,9 +43,6 @@ def add_raw_noise(np_image, random_ccm_tensor=None, random_gains_list=None, a=1.
     cam2rgbs = torch.stack([metadata['cam2rgb'], metadata['cam2rgb']], dim=0)
     output = process(raw_image, red_gains, blue_gains, cam2rgbs)
 
-    # Color jitter
-    # output = color_jitter(output, bright, contrast, saturation, hue)
-
     output = output.numpy()
     redemosaiced_image = output[0]
     noise_image = output[1]
@@ -55,14 +52,14 @@ def add_raw_noise(np_image, random_ccm_tensor=None, random_gains_list=None, a=1.
 
 if __name__ == '__main__':
 
-    fname = '00063'
+    fname = '000146'
     ext = 'png'
     path = f'/mnt/d/results/20240417/{fname}.{ext}'
     image = cv2.imread(path, cv2.IMREAD_COLOR)
     image = cv2.cvtColor(np.array(image/255, dtype=np.float32), cv2.COLOR_BGR2RGB)
     image = np.expand_dims(image, axis=0)
     
-    redemosaiced_image, noise_image = add_raw_noise(image, contrast=1)
+    redemosaiced_image, noise_image = add_raw_noise(image, contrast=0.3)
     
     redemosaiced_image = cv2.cvtColor((redemosaiced_image*255).astype(np.uint8), cv2.COLOR_RGB2BGR)
     noise_image = cv2.cvtColor((noise_image*255).astype(np.uint8), cv2.COLOR_RGB2BGR)
