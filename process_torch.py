@@ -85,21 +85,15 @@ def demosaic_opencv(bayer_images):
     pixel_shuffle = torch.nn.PixelShuffle(2)
     bayer_images_up = pixel_shuffle(bayer_images.permute(0,3,1,2))
 
-    zero_tensor = torch.zeros(bayer_images_up.shape[2], bayer_images_up.shape[3])
-    r_mask = zero_tensor.detach().clone()
-    r_mask[::2,::2] = 1
+    # zero_tensor = torch.zeros(bayer_images_up.shape[2], bayer_images_up.shape[3])
+    # r_mask = zero_tensor.detach().clone()
+    # r_mask[::2,::2] = 1
 
-    b_mask = zero_tensor.detach().clone()
-    b_mask[1::2,1::2] = 1
-    g_mask = 1 - r_mask - b_mask
+    # b_mask = zero_tensor.detach().clone()
+    # b_mask[1::2,1::2] = 1
+    # g_mask = 1 - r_mask - b_mask
 
-    bayer_color = torch.stack((bayer_images_up[1,0,...]*b_mask, bayer_images_up[1,0,...]*g_mask, bayer_images_up[1,0,...]*r_mask), dim=-1)
-    save_torch_image(bayer_color, '/mnt/d/results/20240508/00063_6_upsample.png')
-
-
-    exit()
-    
-
+    # bayer_color = torch.stack((bayer_images_up[1,0,...]*b_mask, bayer_images_up[1,0,...]*g_mask, bayer_images_up[1,0,...]*r_mask), dim=-1)
 
     bayer_images_np = (bayer_images_up.permute(0,2,3,1).numpy()*255).astype(np.uint8)
     rgb_images_np = [cv2.cvtColor(bayer_images_np[b], cv2.COLOR_BayerRGGB2RGB_VNG) for b in range(0, bayer_images_np.shape[0])]
