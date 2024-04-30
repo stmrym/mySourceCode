@@ -60,8 +60,8 @@ if __name__ == '__main__':
     mode = 'pair'
     blur_dirname = 'blur'
     sharp_dirname = 'sharp'
-    src_dir = '/home/moriyamasota/dataset/chronos/test'
-    dst_dir = '/home/moriyamasota/dataset/chronos_raw/test'
+    src_dir = '/home/moriyamasota/dataset/chronos/test/0425-18'
+    dst_dir = '/home/moriyamasota/dataset/chronos_raw/test/0425-1'
     
     assert src_dir != dst_dir, 'Do not equal src_dir to dst_dir'
 

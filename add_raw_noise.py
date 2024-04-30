@@ -52,20 +52,20 @@ def add_raw_noise(np_image, random_ccm_tensor=None, random_gains_list=None, lamb
 
 if __name__ == '__main__':
 
-    fname = '000146'
+    fname = '00063'
     ext = 'png'
-    path = f'/mnt/d/results/20240417/{fname}.{ext}'
+    path = f'/mnt/d/results/20240508/{fname}.{ext}'
     image = cv2.imread(path, cv2.IMREAD_COLOR)
     image = cv2.cvtColor(np.array(image/255, dtype=np.float32), cv2.COLOR_BGR2RGB)
     image = np.expand_dims(image, axis=0)
     
-    redemosaiced_image, noise_image = add_raw_noise(image, contrast=0.3)
+    redemosaiced_image, noise_image = add_raw_noise(image, contrast=1.0)
     
     redemosaiced_image = cv2.cvtColor((redemosaiced_image*255).astype(np.uint8), cv2.COLOR_RGB2BGR)
     noise_image = cv2.cvtColor((noise_image*255).astype(np.uint8), cv2.COLOR_RGB2BGR)
 
-    cv2.imwrite(f'/mnt/d/results/20240417/{fname}_raw_VNG.png', redemosaiced_image)
-    cv2.imwrite(f'/mnt/d/results/20240417/{fname}_raw_noise_VNG.png', noise_image)
+    cv2.imwrite(f'/mnt/d/results/20240508/{fname}_raw_VNG.png', redemosaiced_image)
+    cv2.imwrite(f'/mnt/d/results/20240508/{fname}_raw_noise_VNG.png', noise_image)
 
     # for channel in range(0, processed_np.shape[-1]):
     #     cv2.imwrite(f'/mnt/d/results/20240417/{fname}_{channel}_processed.png', cv2.cvtColor(processed_np[0,:,:,channel], cv2.COLOR_RGB2BGR))

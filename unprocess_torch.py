@@ -20,6 +20,37 @@ http://timothybrooks.com/tech/unprocessing
 """
 
 import torch
+import cv2
+import os
+import numpy as np
+
+def save_torch_image(tensor, savename):
+    if len(tensor.shape) > 3:
+        tensor = tensor[1,:,:,:]
+    print(tensor.shape)
+    np_array = tensor.numpy()*255
+    np_image = np.clip(np_array, 0, 255).astype(np.uint8)
+
+    if np_image.shape[-1] == 4:
+        zero_array = np.zeros((np_image.shape[0], np_image.shape[1], 2))
+
+        r = np.concatenate((np_image[:,:,0].copy()[:,:,np.newaxis], zero_array), axis=2)[:,:,[1,2,0]]
+        g1 = np.concatenate((np_image[:,:,1].copy()[:,:,np.newaxis], zero_array), axis=2)[:,:,[1,0,2]]
+        g2 = np.concatenate((np_image[:,:,2].copy()[:,:,np.newaxis], zero_array), axis=2)[:,:,[1,0,2]]
+        b = np.concatenate((np_image[:,:,3].copy()[:,:,np.newaxis], zero_array), axis=2)[:,:,[0,1,2]]
+
+        basename, ext = os.path.splitext(savename)
+
+        cv2.imwrite(basename + '_r' + ext, r)
+        cv2.imwrite(basename + '_g1' + ext, g1)
+        cv2.imwrite(basename + '_g2' + ext, g2)
+        cv2.imwrite(basename + '_b' + ext, b)
+
+    else:
+        np_image = cv2.cvtColor(np_image, cv2.COLOR_RGB2BGR)
+
+    cv2.imwrite(savename, np_image)
+
 
 def random_ccm():
     """Generates random RGB -> Camera color correction matrices."""

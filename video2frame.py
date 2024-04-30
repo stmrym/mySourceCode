@@ -24,4 +24,4 @@ def save_all_frames(video_path, dir_path, ext='png'):
             return
 
 if __name__ == '__main__':
-    save_all_frames('/mnt/d/Chronos/vid_2024-04-25_18-08-34 - Trim.mp4', '/mnt/d/Chronos/2024-04-25_18-08-34_1')
+    save_all_frames('/mnt/d/Chronos/vid_2024-04-25_18-20-36 - Trim.mp4', '/mnt/d/Chronos/2024-04-25_18-20-36')
