@@ -183,15 +183,15 @@ def unprocess(image, random_ccm_tensor=None, random_gains_list=None, contrast=1.
 
 def random_noise_levels():
     """Generates random noise levels from a log-log linear distribution."""
-    log_min_shot_noise = torch.log(torch.tensor(0.0001))
-    log_max_shot_noise = torch.log(torch.tensor(0.012))
+    log_min_shot_noise = torch.log10(torch.tensor(0.0001))
+    log_max_shot_noise = torch.log10(torch.tensor(0.012))
 
     log_shot_noise = (log_max_shot_noise - log_min_shot_noise) * torch.rand(1) + log_min_shot_noise
-    shot_noise = torch.exp(log_shot_noise[0])
+    shot_noise = 10**log_shot_noise[0]
 
     line = lambda x: 2.18 * x + 1.20
     log_read_noise = line(log_shot_noise) + 0.26 * torch.randn(1)
-    read_noise = torch.exp(log_read_noise[0])
+    read_noise = 10**(log_read_noise[0])
 
     return shot_noise, read_noise
 

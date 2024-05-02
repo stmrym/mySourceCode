@@ -29,20 +29,20 @@ class dataPlot():
 
 plot_list = [
     dataPlot(
-        exp_path = '../../STDAN_modified/exp_log/test/20240410_._Original_ckpt-epoch-0900/metrics_csv',
-        c = 'tab:blue',
-        lw = 1.5,
-        label = 'STDAN'
-        ),
-    dataPlot(
-        exp_path = '../../STDAN_modified/exp_log/test/20240410_._F_ckpt-epoch-0900/metrics_csv',
+        exp_path = '../../STDAN_modified/exp_log/test/20240502_WO_augmentation/chronos/0250_metrics_csv',
         c = 'tab:red',
         lw = 1.5,
-        label='ESTDAN'
+        label = 'Epoch 250'
+        ),
+    dataPlot(
+        exp_path = '../../STDAN_modified/exp_log/test/20240502_WO_augmentation/chronos/0750_metrics_csv',
+        c = 'tab:blue',
+        lw = 1.5,
+        label='Epoch 750'
         )
 ]
 metric_type = 'PSNR'
-savepath = '../../STDAN_modified/debug_results/20240410_PSNR'      
+savepath = '../../STDAN_modified/exp_log/test/20240502_WO_augmentation/chronos/plot'      
 
 csv_path_list = sorted(glob.glob(os.path.join(plot_list[0].exp_path, '*.csv')))
 seq_list = [os.path.splitext(os.path.basename(csv_path))[0] for csv_path in csv_path_list]

@@ -6,7 +6,7 @@ import math
 from skimage.metrics import structural_similarity as ssim
 import cv2
 import pandas as pd
-from tqdm import tqdm
+from tqdm.contrib import tzip
 import lpips
 import torch
 
@@ -99,7 +99,7 @@ def calc_metrics(output_path, gt_paths, save_dir):
     # start calc
     for seq, (output_path_list, gt_path_list) in seq_dict.items():
         print(seq)
-        for output_path, gt_path in tqdm(zip(output_path_list, gt_path_list)):
+        for output_path, gt_path in tzip(zip(output_path_list, gt_path_list)):
             assert os.path.basename(output_path) == os.path.basename(gt_path), f"basenames gt_file={os.path.basename(gt_path)} don't match"
             gt = cv2.cvtColor(cv2.imread(gt_path), cv2.COLOR_BGR2GRAY)
             output = cv2.cvtColor(cv2.imread(output_path), cv2.COLOR_BGR2GRAY)
