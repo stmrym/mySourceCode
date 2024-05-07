@@ -7,6 +7,7 @@ from skimage.metrics import structural_similarity as ssim
 import cv2
 import pandas as pd
 from tqdm.contrib import tzip
+from tqdm import tqdm
 import lpips
 import torch
 
@@ -25,7 +26,8 @@ calculating SSIMs of all test video sequences
 [Output]: SSIM .csv files of each video sequence  (./SSIM_csv/xxx.csv)
 '''
 
-metric_type_list = ['PSNR', 'SSIM', 'LPIPS']
+metric_type_list = ['PSNR', 'SSIM']
+# metric_type_list = ['PSNR', 'SSIM', 'LPIPS']
 
 parser = argparse.ArgumentParser(description='make ssim.csv file from test results.')
 parser.add_argument('--output_path', required = True, help="e.g., ./exp_log/WO_Motion_small_2024-02-08T161225_STDAN_Stack_BSD_3ms24ms_GOPRO/visualization/epoch-0200")
@@ -86,20 +88,17 @@ def calc_metrics(output_path, gt_paths, save_dir):
         seq_dict[seq] = (output_path_list, gt_path_list)
 
     # stack_df, avg_df initialize
-    stack_df = pd.DataFrame(
-        columns=['seq', 'frame']
-        )
     avg_df = pd.DataFrame(index = seq_list)
     metric_list = []
     # metric instance initialize
     for metric_type in metric_type_list:
-        stack_df[metric_type] = 0.0
         avg_df['avg' + metric_type] = 0.0
+        avg_df['var' + metric_type] = 0.0
         metric_list.append(Metric(metric_type))
     # start calc
     for seq, (output_path_list, gt_path_list) in seq_dict.items():
         print(seq)
-        for output_path, gt_path in tzip(zip(output_path_list, gt_path_list)):
+        for output_path, gt_path in zip(tqdm(output_path_list), gt_path_list):
             assert os.path.basename(output_path) == os.path.basename(gt_path), f"basenames gt_file={os.path.basename(gt_path)} don't match"
             gt = cv2.cvtColor(cv2.imread(gt_path), cv2.COLOR_BGR2GRAY)
             output = cv2.cvtColor(cv2.imread(output_path), cv2.COLOR_BGR2GRAY)
@@ -111,9 +110,9 @@ def calc_metrics(output_path, gt_paths, save_dir):
         for metric in metric_list:  # make data
             data[metric.type] = metric.value_list
             avg_df.at[seq, 'avg' + metric.type] = metric.value_list.mean()
+            avg_df.at[seq, 'sd' + metric.type] = np.sqrt(metric.value_list.var())
             metric.reset()  # reset metric instance for next seq
         df = pd.DataFrame(data=data)
-        stack_df = pd.concat([stack_df, df], axis=0)
         # save each dataframe
         save_path = os.path.join(save_dir,'metrics_csv')
         if not os.path.isdir(save_path):
@@ -123,9 +122,8 @@ def calc_metrics(output_path, gt_paths, save_dir):
     # save avg_df, stack_df
     for metric_type in metric_type_list:
         avg_df.at['Avg.', 'avg' + metric_type] = avg_df['avg' + metric_type].mean()
+        avg_df.at['Avg.', 'sd' + metric_type] = np.sqrt(avg_df['avg' + metric_type].var())
     avg_df.to_csv(os.path.join(save_dir, 'avg_metrics.csv')) # save to .csv
-    stack_df.to_csv(os.path.join(save_dir, 'stack.csv'))
-
 
 if __name__ == '__main__':
     calc_metrics(args.output_path, args.gt_paths, args.save_dir)
