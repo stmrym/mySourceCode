@@ -93,7 +93,7 @@ def calc_metrics(output_path, gt_paths, save_dir):
     # metric instance initialize
     for metric_type in metric_type_list:
         avg_df['avg' + metric_type] = 0.0
-        avg_df['var' + metric_type] = 0.0
+        avg_df['sd' + metric_type] = 0.0
         metric_list.append(Metric(metric_type))
     # start calc
     for seq, (output_path_list, gt_path_list) in seq_dict.items():

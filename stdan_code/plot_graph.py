@@ -29,20 +29,20 @@ class dataPlot():
 
 plot_list = [
     dataPlot(
-        exp_path = '../../STDAN_modified/exp_log/train/Sobel_not_fixed_2024-05-03T125515_ESTDAN_light_Stack_GOPRO/visualization/epoch-0400_output/metrics_csv',
+        exp_path = '../../STDAN_modified/exp_log/test/20240508_W_augmentation/chronos/500_out_metrics_csv',
         c = 'tab:blue',
         lw = 1.5,
-        label = 'Variable Sobel weights'
+        label = 'Chronos'
         ),
     dataPlot(
-        exp_path = '../../STDAN_modified/exp_log/train/Sobel_fixed_2024-04-23T042249_ESTDAN_light_Stack_GOPRO/visualization/epoch-0400_output/metrics_csv',
+        exp_path = '../../STDAN_modified/exp_log/test/20240508_W_augmentation/chronos_raw/500_out_metrics_csv',
         c = 'tab:red',
         lw = 1.5,
-        label='Fixed Sobel weights'
+        label='Chronos + noise'
         )
 ]
 metric_type = 'SSIM'
-savepath = '../../STDAN_modified/debug_results'      
+savepath = '../../STDAN_modified/exp_log/test/20240508_W_augmentation/graph'      
 
 csv_path_list = sorted(glob.glob(os.path.join(plot_list[0].exp_path, '*.csv')))
 seq_list = [os.path.splitext(os.path.basename(csv_path))[0] for csv_path in csv_path_list]
