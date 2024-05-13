@@ -51,17 +51,25 @@ def valid_convolve(xx, size):
     return xx_mean
 
 class Metric():
-    def __init__(self, type):
+    def __init__(self, type, rgb_range=1.0, pixel_max=1, shave=4):
         self.type = type
+        self.rgb_range = rgb_range
+        self.pixel_max = pixel_max
+        self.shave = shave
         if self.type == 'LPIPS':
             self.loss_fn_alex = lpips.LPIPS(net='alex')
         self.value_list = np.empty([0])
 
     def calc_metric(self, output_image, gt_image):
         if self.type == 'PSNR':
-            self.value_list = np.append(self.value_list, cv2.PSNR(output_image, gt_image))
+            self._img1 = output_image[self.shave:-self.shave, self.shave:-self.shave, :]/255.0
+            self._img2 = gt_image[self.shave:-self.shave, self.shave:-self.shave, :]/255.0
+            self._mse = np.mean((self._img1/self.rgb_range - self._img2/self.rgb_range)**2)
+            self._psnr = 20 * np.log10(self.pixel_max / np.sqrt(self._mse))
+            self.value_list = np.append(self.value_list, self._psnr)
         elif self.type == 'SSIM':
-            self.value_list = np.append(self.value_list, ssim(output_image, gt_image))
+            self.value_list = np.append(self.value_list, ssim(output_image, gt_image, channel_axis=2, gaussian_weights=True, sigma=1.5, use_sample_covariance=False,
+                        data_range=255.0))
         elif self.type == 'LPIPS':
             output_tensor = torch.from_numpy(output_image.astype(np.float32)/255).clone()
             gt_tensor = torch.from_numpy(gt_image.astype(np.float32)/255).clone()
@@ -87,7 +95,7 @@ def calc_metrics(output_path, gt_paths, save_dir):
         assert len(output_path_list) == len(gt_path_list), f'output {len(output_path_list)}, GT {len(gt_path_list)} do not match.'
         seq_dict[seq] = (output_path_list, gt_path_list)
 
-    # stack_df, avg_df initialize
+    # avg_df initialize
     avg_df = pd.DataFrame(index = seq_list)
     metric_list = []
     # metric instance initialize
@@ -100,8 +108,8 @@ def calc_metrics(output_path, gt_paths, save_dir):
         print(seq)
         for output_path, gt_path in zip(tqdm(output_path_list), gt_path_list):
             assert os.path.basename(output_path) == os.path.basename(gt_path), f"basenames gt_file={os.path.basename(gt_path)} don't match"
-            gt = cv2.cvtColor(cv2.imread(gt_path), cv2.COLOR_BGR2GRAY)
-            output = cv2.cvtColor(cv2.imread(output_path), cv2.COLOR_BGR2GRAY)
+            gt = cv2.imread(gt_path)
+            output = cv2.imread(output_path)
             for metric in metric_list:  # calc each metric
                 metric.calc_metric(output, gt)
 
