@@ -5,8 +5,8 @@ from tqdm import tqdm
 from pygifsicle import gifsicle
 
 
-path = '../STDAN_modified/exp_log/train/20231221_2023-12-21T185537_STDAN_Stack_BSD_3ms24ms_GOPRO/visualization/BSD_3ms24ms/epoch-0700/output/027'
-savename = '../STDAN_modified/exp_log/train/20231221_2023-12-21T185537_STDAN_Stack_BSD_3ms24ms_GOPRO/visualization/BSD_3ms24ms/epoch-0700/output/027.gif'
+path = '../dataset/chronos/test/0425-182036/blur'
+savename = '../dataset/chronos/test/0425-182036/blur.gif'
 
 file_list = sorted(glob.glob(os.path.join(path, '*.png')))
 # file_list = file_list[2:-3]
