@@ -26,8 +26,8 @@ calculating SSIMs of all test video sequences
 [Output]: SSIM .csv files of each video sequence  (./SSIM_csv/xxx.csv)
 '''
 
-metric_type_list = ['PSNR', 'SSIM']
-# metric_type_list = ['PSNR', 'SSIM', 'LPIPS']
+# metric_type_list = ['PSNR', 'SSIM']
+metric_type_list = ['PSNR', 'SSIM', 'LPIPS']
 
 parser = argparse.ArgumentParser(description='make ssim.csv file from test results.')
 parser.add_argument('--output_path', required = True, help="e.g., ./exp_log/WO_Motion_small_2024-02-08T161225_STDAN_Stack_BSD_3ms24ms_GOPRO/visualization/epoch-0200")
@@ -73,7 +73,7 @@ class Metric():
         elif self.type == 'LPIPS':
             output_tensor = torch.from_numpy(output_image.astype(np.float32)/255).clone()
             gt_tensor = torch.from_numpy(gt_image.astype(np.float32)/255).clone()
-            d = self.loss_fn_alex(output_tensor, gt_tensor).detach().numpy()
+            d = self.loss_fn_alex(output_tensor.permute(2,0,1), gt_tensor.permute(2,0,1)).detach().numpy()
             self.value_list = np.append(self.value_list, d[0,0,0,0])
 
     def reset(self):
@@ -103,7 +103,7 @@ def calc_metrics(output_path, gt_paths, save_dir):
         avg_df['avg' + metric_type] = 0.0
         avg_df['sd' + metric_type] = 0.0
         metric_list.append(Metric(metric_type))
-    # start calc
+    # start calc metrics
     for seq, (output_path_list, gt_path_list) in seq_dict.items():
         print(seq)
         for output_path, gt_path in zip(tqdm(output_path_list), gt_path_list):
