@@ -29,20 +29,20 @@ class dataPlot():
 
 plot_list = [
     dataPlot(
-        exp_path = '../../STDAN_modified/exp_log/train/2024-05-21T065149_STDAN_BSD_3ms24ms_GOPRO/visualization/epoch-1200_outcsv/metrics_csv',
+        exp_path = '../../STDAN_modified/exp_log/train/F_2024-05-28T053356_STDAN_BSD_3ms24ms_GOPRO/visualization/epoch-0400_csv',
         c = 'tab:blue',
         lw = 1.5,
-        label = 'STDAN'
+        label = 'STDAN w/FFT loss (3-frame)'
         ),
     dataPlot(
-        exp_path = '../../STDAN_modified/exp_log/train/2024-05-25T003311_ESTDAN_middle_v2_BSD_3ms24ms_GOPRO/visualization/epoch-1200_outcsv/metrics_csv',
-        c = 'tab:red',
+        exp_path = '../../STDAN_modified/exp_log/train/2024-05-31T041732_F_STDAN_BSD_3ms24ms_GOPRO/visualization/epoch-0400_csv',
+        c = 'tab:purple',
         lw = 1.5,
-        label='ESTDANv2'
+        label='STDAN w/FFT loss (5-frame)'
         )
 ]
-metric_type = 'LPIPS'
-savepath = '../../STDAN_modified/debug_results/STDAN_ESTDANv2_LPIPS'      
+metric_type = 'out_SSIM'
+savepath = '../../STDAN_modified/debug_results/3_STDAN_SSIM'      
 
 csv_path_list = sorted(glob.glob(os.path.join(plot_list[0].exp_path, '*.csv')))
 seq_list = [os.path.splitext(os.path.basename(csv_path))[0] for csv_path in csv_path_list]
