@@ -7,7 +7,6 @@ from pygifsicle import gifsicle
 
 path = '../dataset/GOPRO_Large/test/GOPR0854_11_00/blur_gamma'
 savename = '../dataset/GOPR0854_11_00.gif'
-# savename = '../dataset/chronos/test/0425-182036/blur.gif'
 
 file_list = sorted(glob.glob(os.path.join(path, '*.png')))
 # file_list = file_list[2:-3]
