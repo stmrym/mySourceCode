@@ -42,6 +42,6 @@ def save_all_videos(video_dir: str, save_dataset_dir:str):
 if __name__ == '__main__':
     
     save_all_videos(
-        video_dir = '/mnt/e/data/Mi11Lite', 
-        save_dataset_dir = '/mnt/e/data/Mi11Lite'
+        video_dir = '/mnt/d/Chronos_HS/test', 
+        save_dataset_dir = '/mnt/d/Chronos_HS/test'
         )
