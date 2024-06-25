@@ -10,6 +10,7 @@ from tqdm.contrib import tzip
 from tqdm import tqdm
 import lpips
 import torch
+from typing import List
 
 '''
 calculating SSIMs of all test video sequences
@@ -80,7 +81,7 @@ class Metric():
         self.value_list = np.empty([0])
 
 
-def calc_metrics(output_path, gt_paths, save_dir):
+def prepare_seq_dict(output_path: str, gt_paths: List[str]) -> dict:
 
     seq_list = [f for f in sorted(os.listdir(output_path)) if (os.path.isdir(os.path.join(output_path, f)) and 'metrics_csv' not in f)]
     seq_dict = {} # {key='seq' : value=([output_path_list], [gt_path_list])}
@@ -95,8 +96,14 @@ def calc_metrics(output_path, gt_paths, save_dir):
         assert len(output_path_list) == len(gt_path_list), f'output {len(output_path_list)}, GT {len(gt_path_list)} do not match.'
         seq_dict[seq] = (output_path_list, gt_path_list)
 
+    # seq_dict: {seq: [output_path_list, gt_path_list]}
+    return seq_dict    
+
+
+def calc_metrics(seq_dict: dict, save_dir: str) -> None:
+    
     # avg_df initialize
-    avg_df = pd.DataFrame(index = seq_list)
+    avg_df = pd.DataFrame(index = seq_dict.keys())
     metric_list = []
     # metric instance initialize
     for metric_type in metric_type_list:
@@ -133,5 +140,33 @@ def calc_metrics(output_path, gt_paths, save_dir):
         avg_df.at['Avg.', 'sd' + metric_type] = np.sqrt(avg_df['avg' + metric_type].var())
     avg_df.to_csv(os.path.join(save_dir, 'avg_metrics.csv')) # save to .csv
 
+
+def calc_ssim_map(seq_dict: str, save_dir: str) -> None:
+    # calc and output ssim_map and gradient of ssim_map
+ 
+    for seq, (output_path_list, gt_path_list) in seq_dict.items():
+        print(seq)
+        for output_path, gt_path in zip(tqdm(output_path_list), gt_path_list):
+            assert os.path.basename(output_path) == os.path.basename(gt_path), f"basenames gt_file={os.path.basename(gt_path)} don't match"
+            gt = cv2.imread(gt_path).astype(np.float32)
+            output = cv2.imread(output_path).astype(np.float32)
+
+            ssim_value, grad, ssim_map = ssim(output, gt, channel_axis=2, gaussian_weights=True, sigma=1.5, use_sample_covariance=False,
+                        data_range=255.0, gradient=True, full=True)
+            
+            
+    
+            for channel in range(3):
+                np.savetxt(f'./grad_{channel}.csv', grad[:,:,channel], delimiter=',')
+                np.savetxt(f'./ssim_map_{channel}.csv', ssim_map[:,:,channel], delimiter=',')
+            exit()
+
+
+
+
 if __name__ == '__main__':
-    calc_metrics(args.output_path, args.gt_paths, args.save_dir)
+
+    seq_dict = prepare_seq_dict(args.output_path, args.gt_paths)
+
+    # calc_ssim_map(seq_dict, args.save_dir)
+    calc_metrics(seq_dict, args.save_dir)
