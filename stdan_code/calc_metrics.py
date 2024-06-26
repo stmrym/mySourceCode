@@ -11,6 +11,8 @@ from tqdm import tqdm
 import lpips
 import torch
 from typing import List
+from matplotlib import cm
+import matplotlib.pyplot as plt
 
 '''
 calculating SSIMs of all test video sequences
@@ -26,6 +28,12 @@ calculating SSIMs of all test video sequences
 
 [Output]: SSIM .csv files of each video sequence  (./SSIM_csv/xxx.csv)
 '''
+
+def gray2cmap_numpy(image_np: np.ndarray, cmap_name: str = 'bwr') -> np.ndarray:
+    colormap = cm.get_cmap(cmap_name, 256)
+    # (H, W) -> (H, W, 3)
+    converted_array = colormap(image_np)[:,:,0:3]
+    return converted_array
 
 # metric_type_list = ['PSNR', 'SSIM']
 metric_type_list = ['PSNR', 'SSIM', 'LPIPS']
@@ -100,6 +108,23 @@ def prepare_seq_dict(output_path: str, gt_paths: List[str]) -> dict:
     return seq_dict    
 
 
+def prepare_one_seq_dict(output_path: str, gt_paths: List[str]) -> dict:
+
+    seq = output_path.split('/')[-1]
+    seq_dict = {}
+    output_frame_list = [f.split('/')[-1] for f in sorted(glob.glob(os.path.join(output_path, '*.png')))]
+    output_path_list = sorted(glob.glob(os.path.join(output_path, '*.png')))
+    
+    for gt_path in gt_paths:
+        if os.path.isdir(os.path.join(gt_path, seq, 'sharp')): #  GOPRO
+                gt_path_list = [os.path.join(gt_path, seq, 'sharp', output_frame) for output_frame in output_frame_list]
+        elif os.path.isdir(os.path.join(gt_path, seq, 'Sharp', 'RGB')):  # BSD_3ms24ms
+                gt_path_list = [os.path.join(gt_path, seq, 'Sharp', 'RGB', output_frame) for output_frame in output_frame_list]
+    assert len(output_path_list) == len(gt_path_list), f'output {len(output_path_list)}, GT {len(gt_path_list)} do not match.'
+    seq_dict[seq] = (output_path_list, gt_path_list)
+    return seq_dict
+
+
 def calc_metrics(seq_dict: dict, save_dir: str) -> None:
     
     # avg_df initialize
@@ -141,32 +166,59 @@ def calc_metrics(seq_dict: dict, save_dir: str) -> None:
     avg_df.to_csv(os.path.join(save_dir, 'avg_metrics.csv')) # save to .csv
 
 
-def calc_ssim_map(seq_dict: str, save_dir: str) -> None:
+def calc_ssim_map(seq_dict: str, save_dir: str, grayscale: bool = True) -> None:
     # calc and output ssim_map and gradient of ssim_map
- 
     for seq, (output_path_list, gt_path_list) in seq_dict.items():
         print(seq)
         for output_path, gt_path in zip(tqdm(output_path_list), gt_path_list):
             assert os.path.basename(output_path) == os.path.basename(gt_path), f"basenames gt_file={os.path.basename(gt_path)} don't match"
-            gt = cv2.imread(gt_path).astype(np.float32)
-            output = cv2.imread(output_path).astype(np.float32)
 
-            ssim_value, grad, ssim_map = ssim(output, gt, channel_axis=2, gaussian_weights=True, sigma=1.5, use_sample_covariance=False,
+            if grayscale:
+                gt = cv2.imread(gt_path, cv2.IMREAD_GRAYSCALE).astype(np.float32)
+                output = cv2.imread(output_path, cv2.IMREAD_GRAYSCALE).astype(np.float32)
+                ssim_value, grad, ssim_map = ssim(output, gt, gaussian_weights=True, sigma=1.5, use_sample_covariance=False,
                         data_range=255.0, gradient=True, full=True)
-            
-            
+
+                save_map_path = os.path.join(save_dir, 'map_' + seq)
+                save_grad_path = os.path.join(save_dir, 'grad_' + seq)
+                if not os.path.isdir(save_map_path):
+                    os.makedirs(save_map_path, exist_ok=True)
+                # if not os.path.isdir(save_grad_path):
+                #     os.makedirs(save_grad_path, exist_ok=True)
+                
+                # print(grad.min(), grad.max())
+                # print(ssim_map.min(), ssim_map.max())
+                # plt.imshow(grad, vmin=-1e-6, vmax=1e-6, cmap='bwr')
+                # plt.colorbar()
+                # plt.savefig(os.path.join(save_grad_path, os.path.basename(output_path)))
+                # plt.close()
+
+
+                plt.imshow(ssim_map, vmin=0, vmax=1, cmap='jet')
+                plt.colorbar()
+                plt.savefig(os.path.join(save_map_path, os.path.basename(output_path)))
+                plt.close()
+
+                # print(ssim_value)
+
+            else:
+                gt = cv2.imread(gt_path).astype(np.float32)
+                output = cv2.imread(output_path).astype(np.float32)
+                ssim_value, grad, ssim_map = ssim(output, gt, channel=2, gaussian_weights=True, sigma=1.5, use_sample_covariance=False,
+                        data_range=255.0, gradient=True, full=True)
     
-            for channel in range(3):
-                np.savetxt(f'./grad_{channel}.csv', grad[:,:,channel], delimiter=',')
-                np.savetxt(f'./ssim_map_{channel}.csv', ssim_map[:,:,channel], delimiter=',')
-            exit()
+                for channel in range(3):
+                    np.savetxt(f'./grad_{channel}.csv', grad[:,:,channel], delimiter=',')
+                    np.savetxt(f'./ssim_map_{channel}.csv', ssim_map[:,:,channel], delimiter=',')
+            
 
 
 
 
 if __name__ == '__main__':
 
-    seq_dict = prepare_seq_dict(args.output_path, args.gt_paths)
+    # seq_dict = prepare_seq_dict(args.output_path, args.gt_paths)
+    seq_dict = prepare_one_seq_dict(args.output_path, args.gt_paths)
 
-    # calc_ssim_map(seq_dict, args.save_dir)
-    calc_metrics(seq_dict, args.save_dir)
+    calc_ssim_map(seq_dict, args.save_dir, grayscale=True)
+    # calc_metrics(seq_dict, args.save_dir)
