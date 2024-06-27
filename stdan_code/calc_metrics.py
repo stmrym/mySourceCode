@@ -6,13 +6,12 @@ import math
 from skimage.metrics import structural_similarity as ssim
 import cv2
 import pandas as pd
-from tqdm.contrib import tzip
 from tqdm import tqdm
 import lpips
 import torch
 from typing import List
 from matplotlib import cm
-import matplotlib.pyplot as plt
+from graph_util import plot_heatmap
 
 '''
 calculating SSIMs of all test video sequences
@@ -180,26 +179,11 @@ def calc_ssim_map(seq_dict: str, save_dir: str, grayscale: bool = True) -> None:
                         data_range=255.0, gradient=True, full=True)
 
                 save_map_path = os.path.join(save_dir, 'map_' + seq)
-                save_grad_path = os.path.join(save_dir, 'grad_' + seq)
                 if not os.path.isdir(save_map_path):
                     os.makedirs(save_map_path, exist_ok=True)
-                # if not os.path.isdir(save_grad_path):
-                #     os.makedirs(save_grad_path, exist_ok=True)
-                
-                # print(grad.min(), grad.max())
-                # print(ssim_map.min(), ssim_map.max())
-                # plt.imshow(grad, vmin=-1e-6, vmax=1e-6, cmap='bwr')
-                # plt.colorbar()
-                # plt.savefig(os.path.join(save_grad_path, os.path.basename(output_path)))
-                # plt.close()
+                save_name = os.path.join(save_map_path, os.path.basename(output_path))
 
-
-                plt.imshow(ssim_map, vmin=0, vmax=1, cmap='jet')
-                plt.colorbar()
-                plt.savefig(os.path.join(save_map_path, os.path.basename(output_path)))
-                plt.close()
-
-                # print(ssim_value)
+                plot_heatmap(plot_data=ssim_map, save_name=save_name, vmin=0, vmax=1, cmap='jet')
 
             else:
                 gt = cv2.imread(gt_path).astype(np.float32)
