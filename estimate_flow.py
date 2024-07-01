@@ -58,10 +58,11 @@ if __name__ == '__main__':
     config_file = '../STDAN_modified/mmflow/configs/raft/raft_8x2_100k_mixed_368x768.py'
     checkpoint_file = '../STDAN_modified/mmflow/checkpoints/raft_8x2_100k_mixed_368x768.pth'
     device = 'cuda:0'
-    path = '../dataset/BSD_3ms24ms/test/%s/Sharp/RGB'
+    path = '../dataset/GOPRO_Large/test/%s/sharp'
     # seq_select = '128'
     seq_select = 'all'
-    save_base_dir = '../dataset/BSD_3ms24ms/flow_sharp'
+    save_base_dir = '../dataset/GOPRO_Large/flow_sharp'
+    batch_size = 8
     #######
 
 
@@ -83,6 +84,6 @@ if __name__ == '__main__':
         save_name = os.path.join(save_base_dir, seq) + '.npz'
         frame_list = sorted(glob.glob(os.path.join(seq_path, '*.png')))
 
-        flow_estimate_batch(flow_estimator, frame_list, save_name, batch_size=32)
+        flow_estimate_batch(flow_estimator, frame_list, save_name, batch_size)
     
 
