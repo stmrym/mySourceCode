@@ -66,17 +66,6 @@ class Metric_dataframe():
             self.avg_df['avg' + metric_type] = 0.0
             self.avg_df['sd' + metric_type] = 0.0
 
-    def make_flow_mask(self, seq,  scale_k = 0.1):
-        flow_npz = np.load(flow_npz_path % seq)
-    
-        for basename in tqdm(flow_npz.files):
-                flow = flow_npz[basename]
-                # normalized
-                H, W, _ = flow.shape
-                flow_mag = np.sqrt((flow[:,:,0]/(scale_k * W))**2 + (flow[:,:,1]/(scale_k * H))**2)
-                # print(flow_mag.max(), flow_mag.min())
-                flow_mag = np.clip(flow_mag, None, 1)
-
     def load_flow_npz(self, flow_npz_path, seq, scale_k):
         flow_npz = np.load(flow_npz_path % seq)
         # [TODO] implement without for loop 
