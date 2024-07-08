@@ -15,34 +15,93 @@ plot SSIM graph
 
 '''
 class dataPlot():
-    def __init__(self, exp_path, c=None, ls='-', lw=1.5, alpha=1, label='sample'):
+    def __init__(self, exp_path, c=None, ls='-', lw=1.5, alpha=1, metric_type='SSIM', label='sample'):
         self.exp_path = exp_path
         self.color = c
         self.linestyle = ls
         self.linewidth = lw
         self.alpha = alpha
         self.label = label
+        self.metric_type = metric_type
 
     def plot(self, seq):
         self.df = pd.read_csv(os.path.join(self.exp_path, seq + '.csv'))
-        ax.plot(self.df['frame'], self.df[metric_type], c=self.color, ls=self.linestyle, lw=self.linewidth, alpha=self.alpha, label=self.label)
+        ax.plot(self.df['frame'], self.df[self.metric_type], c=self.color, ls=self.linestyle, lw=self.linewidth, alpha=self.alpha, label=self.label)
 
 plot_list = [
     dataPlot(
-        exp_path = '../../STDAN_modified/exp_log/train/2024-05-21T065149_STDAN_BSD_3ms24ms_GOPRO/visualization/epoch-1200_outcsv/metrics_csv',
-        c = 'tab:blue',
-        lw = 1.5,
-        label = 'STDAN'
+        exp_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim/metrics_csv',
+        c = 'gray',
+        ls = ':',
+        lw = 1.0,
+        metric_type = 'SSIM',
+        label = 'SSIM'
         ),
     dataPlot(
-        exp_path = '../../STDAN_modified/exp_log/train/2024-06-02T124807_F_ESTDAN_v2_BSD_3ms24ms_GOPRO/visualization/epoch-1200_outcsv/metrics_csv',
+        exp_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim/metrics_csv',
         c = 'tab:red',
-        lw = 1.5,
-        label='ESTDANv2'
+        ls = ':',
+        lw = 1.0,
+        metric_type = 'masked_SSIM',
+        label='motion SSIM'
+        ),
+    dataPlot(
+        exp_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim/metrics_csv',
+        c = 'tab:blue',
+        ls = ':',
+        lw = 1.0,
+        metric_type = 'i_masked_SSIM',
+        label='i-motion SSIM'
+        ),
+
+    dataPlot(
+        exp_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim/metrics_csv',
+        c = 'black',
+        ls = '-',
+        lw = 1.0,
+        metric_type = 'SSIM',
+        label = 'SSIM'
+        ),
+    dataPlot(
+        exp_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim/metrics_csv',
+        c = 'red',
+        ls = '-',
+        lw = 1.0,
+        metric_type = 'masked_SSIM',
+        label='motion SSIM'
+        ),
+    dataPlot(
+        exp_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim/metrics_csv',
+        c = 'blue',
+        ls = '-',
+        lw = 1.0,
+        metric_type = 'i_masked_SSIM',
+        label='i-motion SSIM'
         )
 ]
-metric_type = 'SSIM'
-savepath = '../../STDAN_modified/debug_results/SSIM'      
+
+# plot_list = [
+#     dataPlot(
+#         exp_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim/metrics_csv',
+#         c = 'black',
+#         ls = '-',
+#         lw = 1.0,
+#         metric_type = 'i_masked_SSIM',
+#         label = 'STDAN'
+#         ),
+
+#     dataPlot(
+#         exp_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim/metrics_csv',
+#         c = 'tab:red',
+#         ls = '-',
+#         lw = 1.5,
+#         metric_type = 'i_masked_SSIM',
+#         label = 'ESTDAN'
+#         )
+# ]
+
+metric = 'SSIM'
+savepath = '../STDAN_modified/debug_results/STDAN_ESTDAN'      
 
 csv_path_list = sorted(glob.glob(os.path.join(plot_list[0].exp_path, '*.csv')))
 seq_list = [os.path.splitext(os.path.basename(csv_path))[0] for csv_path in csv_path_list]
@@ -55,7 +114,7 @@ for seq in tqdm(seq_list):
     # ax.set_xlim([0,149])
     #ax.set_ylim([0.945,0.99])
     ax.set_xlabel('frame', fontsize=12)
-    ax.set_ylabel(metric_type, fontsize=12)
+    ax.set_ylabel(metric, fontsize=12)
 
     for plot_obj in plot_list:
         plot_obj.plot(seq)
