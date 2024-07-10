@@ -3,8 +3,8 @@ import cv2
 import numpy as np
 
 
-path = '/mnt/d/results/20240319/003014_GT.png'
-save_name = '/mnt/d/results/20240319/GOPRO_1_4_GT.png'
+path = '/mnt/d/results/20240712/00000123_blur.png'
+save_name = '/mnt/d/results/20240712/2_00000123_blur.png'
 img = cv2.imread(path)
 print(img.shape)
 assert img is not None, 'image empty.'
@@ -17,8 +17,8 @@ h, w, _ = img.shape
 # x1, y1, w1, h1 = [110, 60, 320, 130]
 # x2, y2, w2, h2 = [135, 280, 140, 100]
 # GOPRO
-x1, y1, w1, h1 = [870, 150, 110, 110]
-x2, y2, w2, h2 = [1000, 40, 230, 130]
+x1, y1, w1, h1 = [425, 210, 45, 45]
+x2, y2, w2, h2 = [290, 0, 130, 60]
 
 color1 = (0,0,255)
 color2 = (0,255,0)

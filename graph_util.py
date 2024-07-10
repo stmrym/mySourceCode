@@ -8,6 +8,7 @@ def _plot(plot_data: np.ndarray, save_name: str, cmap: str, vmin: float, vmax: f
     # Initialize plt        
     fig, ax = plt.subplots(dpi=300)
     im = ax.imshow(plot_data, vmin=vmin, vmax=vmax, cmap=cmap)
+    # im = ax.imshow(plot_data, cmap=cmap)
     # ax.axis("off")
     divider = mpl_toolkits.axes_grid1.make_axes_locatable(ax)
     cax = divider.append_axes('right', '5%', pad='3%')
