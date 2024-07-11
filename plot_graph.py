@@ -14,8 +14,9 @@ plot SSIM graph
 [Output] SSIM graph of each video (./SSIM_graph_woSIRR/xxx.png)
 
 '''
+
 class dataPlot():
-    def __init__(self, exp_path, c=None, ls='-', lw=1.5, alpha=1, metric_type='SSIM', label='sample'):
+    def __init__(self, exp_path, c=None, ls='-', lw=1.5, alpha=1, metric_type='SSIM', label='sample', plot_func='plot'):
         self.exp_path = exp_path
         self.color = c
         self.linestyle = ls
@@ -23,19 +24,35 @@ class dataPlot():
         self.alpha = alpha
         self.label = label
         self.metric_type = metric_type
+        self.plot_func = plot_func
 
     def plot(self, seq):
         self.df = pd.read_csv(os.path.join(self.exp_path, seq + '.csv'))
-        ax.plot(self.df['frame'], self.df[self.metric_type], c=self.color, ls=self.linestyle, lw=self.linewidth, alpha=self.alpha, label=self.label)
+        if self.plot_func == 'plot':
+            ax.plot(self.df['frame'], self.df[self.metric_type], c=self.color, ls=self.linestyle, lw=self.linewidth, alpha=self.alpha, label=self.label)
+        elif self.plot_func == 'stackplot':
+            ax.stackplot(self.df['frame'], self.df['masked_SSIM'], self.df['i_masked_SSIM'], ls=self.linestyle, lw=self.linewidth, colors=['orange', 'palegreen'])
+
 
 plot_list = [
+
     dataPlot(
         exp_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim/metrics_csv',
         c = 'gray',
         ls = ':',
         lw = 1.0,
         metric_type = 'SSIM',
-        label = 'SSIM'
+        label = 'SSIM',
+        plot_func = 'stackplot'
+        ),
+    dataPlot(
+        exp_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim/metrics_csv',
+        c = 'gray',
+        ls = ':',
+        lw = 1.0,
+        metric_type = 'SSIM',
+        label = 'STDAN $S$',
+        plot_func = 'plot'
         ),
     dataPlot(
         exp_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim/metrics_csv',
@@ -43,15 +60,8 @@ plot_list = [
         ls = ':',
         lw = 1.0,
         metric_type = 'masked_SSIM',
-        label='motion SSIM'
-        ),
-    dataPlot(
-        exp_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim/metrics_csv',
-        c = 'tab:blue',
-        ls = ':',
-        lw = 1.0,
-        metric_type = 'i_masked_SSIM',
-        label='i-motion SSIM'
+        label='STDAN $S_m$',
+        plot_func = 'plot'
         ),
 
     dataPlot(
@@ -60,7 +70,8 @@ plot_list = [
         ls = '-',
         lw = 1.0,
         metric_type = 'SSIM',
-        label = 'SSIM'
+        label = 'ESTDANv2 $S$',
+        plot_func = 'plot'
         ),
     dataPlot(
         exp_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim/metrics_csv',
@@ -68,15 +79,8 @@ plot_list = [
         ls = '-',
         lw = 1.0,
         metric_type = 'masked_SSIM',
-        label='motion SSIM'
-        ),
-    dataPlot(
-        exp_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim/metrics_csv',
-        c = 'blue',
-        ls = '-',
-        lw = 1.0,
-        metric_type = 'i_masked_SSIM',
-        label='i-motion SSIM'
+        label='ESTDANv2 $S_m$',
+        plot_func = 'plot'
         )
 ]
 
@@ -101,7 +105,7 @@ plot_list = [
 # ]
 
 metric = 'SSIM'
-savepath = '../STDAN_modified/debug_results/STDAN_ESTDAN'      
+savepath = '../STDAN_modified/debug_results/STDAN_ESTDAN2'      
 
 csv_path_list = sorted(glob.glob(os.path.join(plot_list[0].exp_path, '*.csv')))
 seq_list = [os.path.splitext(os.path.basename(csv_path))[0] for csv_path in csv_path_list]
