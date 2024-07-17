@@ -7,10 +7,12 @@ k = 0.1
 sampling = 1
 
 fig, ax = plt.subplots(dpi=300)
-x_, y_ = np.arange(-W//8,W//8 + sampling, sampling), np.arange(-H//8, H//8 + sampling, sampling)
+M = np.minimum(H, W)
+
+x_, y_ = np.arange(-M//8,M//8 + sampling, sampling), np.arange(-M//8, M//8 + sampling, sampling)
 x, y = np.meshgrid(x_, y_)
 
-z = np.sqrt((x/(k*W))**2 + (y/(k*H))**2)
+z = np.sqrt(x**2 + y**2)/(k*M)
 z = np.minimum(z, 1)
 
 im = ax.pcolormesh(x,y,z,cmap='plasma', shading='auto')

@@ -37,7 +37,7 @@ class dataPlot():
 plot_list = [
 
     dataPlot(
-        exp_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim/metrics_csv',
+        exp_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv',
         c = 'gray',
         ls = ':',
         lw = 1.0,
@@ -46,7 +46,7 @@ plot_list = [
         plot_func = 'stackplot'
         ),
     dataPlot(
-        exp_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim/metrics_csv',
+        exp_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv',
         c = 'gray',
         ls = ':',
         lw = 1.0,
@@ -55,7 +55,7 @@ plot_list = [
         plot_func = 'plot'
         ),
     dataPlot(
-        exp_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim/metrics_csv',
+        exp_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv',
         c = 'tab:red',
         ls = ':',
         lw = 1.0,
@@ -65,7 +65,7 @@ plot_list = [
         ),
 
     dataPlot(
-        exp_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim/metrics_csv',
+        exp_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv',
         c = 'black',
         ls = '-',
         lw = 1.0,
@@ -74,7 +74,7 @@ plot_list = [
         plot_func = 'plot'
         ),
     dataPlot(
-        exp_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim/metrics_csv',
+        exp_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv',
         c = 'red',
         ls = '-',
         lw = 1.0,
@@ -105,7 +105,7 @@ plot_list = [
 # ]
 
 metric = 'SSIM'
-savepath = '../STDAN_modified/debug_results/STDAN_ESTDAN2'      
+savepath = '../STDAN_modified/debug_results/STDAN_ESTDAN2_cir'      
 
 csv_path_list = sorted(glob.glob(os.path.join(plot_list[0].exp_path, '*.csv')))
 seq_list = [os.path.splitext(os.path.basename(csv_path))[0] for csv_path in csv_path_list]

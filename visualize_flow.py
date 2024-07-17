@@ -98,7 +98,8 @@ def visualize_weighted_ssim_map(npz_path: str, output_path: str, gt_path: str, s
                 flow = flow_npz[basename]
                 # normalized
                 H, W, _ = flow.shape
-                flow_mag = np.sqrt((flow[:,:,0]/(scale_k * W))**2 + (flow[:,:,1]/(scale_k * H))**2)
+                M = scale_k * np.minimum(H, W)
+                flow_mag = np.sqrt(flow[:,:,0]**2 + flow[:,:,1]**2)/M
                 # print(flow_mag.max(), flow_mag.min())
                 flow_mag = np.clip(flow_mag, None, 1)  
                 
@@ -124,13 +125,15 @@ def visualize_weighted_ssim_map(npz_path: str, output_path: str, gt_path: str, s
 if __name__ == '__main__':
 
     kwargs = {   
-        'npz_path' : '../dataset/GOPRO_Large/flow_sharp/%s.npz',
+        # 'npz_path' : '../dataset/GOPRO_Large/flow_sharp/%s.npz',
+        'npz_path' : '../dataset/BSD_3ms24ms/flow_sharp/%s.npz',
         'seq_select' : 'all',
-        'save_base_dir' : '../dataset/GOPRO_Large/ssim_map',
+        'save_base_dir' : '../dataset/BSD_3ms24ms/ssim_map_cir',
+        # 'save_base_dir' : '../dataset/GOPRO_Large/ssim_map_cir',
         # 'save_base_dir' : '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization',
         'output_path' : '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/epoch-1200_output',
-        # 'gt_path' : '../dataset/BSD_3ms24ms/test/%s/Sharp/RGB',
-        'gt_path' : '../dataset/GOPRO_Large/test/%s/sharp',
+        'gt_path' : '../dataset/BSD_3ms24ms/test/%s/Sharp/RGB',
+        # 'gt_path' : '../dataset/GOPRO_Large/test/%s/sharp',
         'scale_k' : 0.10,
         'mode' : 'img',
         # 'alpha': 0.5,

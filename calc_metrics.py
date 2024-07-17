@@ -110,8 +110,10 @@ class Metric_dataframe():
             # flow normalized
             self._flow = self._flow_npz[kwargs['basename']]
             H, W, _ = self._flow.shape
-            self.flow_mag = np.sqrt((self._flow[:,:,0]/(kwargs['scale_k'] * W))**2 + (self._flow[:,:,1]/(kwargs['scale_k'] * H))**2)
-            self.flow_mag = np.clip(self.flow_mag, None, 1)
+            M = kwargs['scale_k'] * np.minimum(H, W)
+            self.flow_mag = np.sqrt(self._flow[:,:,0]**2 + self._flow[:,:,1]**2) / M
+            self.flow_mag = np.minimum(self.flow_mag, 1)
+
             self.masked_ssim_map = self.flow_mag * self.ssim_map               
 
             # plot_heatmap(plot_data=ssim_map, save_name='../STDAN_modified/debug_results/' + str(self.count) + 'ssim.png', vmin=0, vmax=1, cmap='jet')
@@ -243,13 +245,13 @@ def calc_ssim_map(seq_dict: str, save_dir: str, grayscale: bool = True, mode: st
 if __name__ == '__main__':
     
     ##########
-    exp = '2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO'
-    # exp = '2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO'
+    # exp = '2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO'
+    exp = '2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO'
     # metric_type_list = ['PSNR', 'SSIM', 'LPIPS']
     metric_type_list = ['SSIM', 'masked_SSIM', 'i_masked_SSIM']
     output_path = '../STDAN_modified/exp_log/train/%s/visualization/epoch-1200_output' % exp
     seq_select = 'all'
-    save_dir = '../STDAN_modified/exp_log/train/%s/visualization/c1200_out_maskedssim' % exp
+    save_dir = '../STDAN_modified/exp_log/train/%s/visualization/c1200_out_maskedssim_cir' % exp
     gt_paths = ['../dataset/GOPRO_Large/test', '../dataset/BSD_3ms24ms/test']
     #########
 
