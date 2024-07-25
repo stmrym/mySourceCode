@@ -248,14 +248,14 @@ if __name__ == '__main__':
     # exp = '2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO'
     # exp = '2024-05-23T102821_ESTDAN_v2_BSD_3ms24ms_GOPRO'
     # exp = 'F_2024-05-29T122237_STDAN_BSD_3ms24ms_GOPRO'
-    # exp = 'F_2024-05-31T115702_ESTDAN_v2_BSD_3ms24ms_GOPRO'
-    exp = '2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO'
+    # exp = '2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO'
+    exp = '2024-07-17T094452__STDAN_BSD_3ms24ms'
     # metric_type_list = ['PSNR', 'SSIM', 'LPIPS']
-    metric_type_list = ['SSIM']
-    # metric_type_list = ['SSIM', 'masked_SSIM', 'i_masked_SSIM']
+    # metric_type_list = ['SSIM']
+    metric_type_list = ['SSIM', 'masked_SSIM', 'i_masked_SSIM']
     output_path = '../STDAN_modified/exp_log/train/%s/visualization/epoch-1200_output' % exp
     seq_select = 'all'
-    save_dir = '../STDAN_modified/exp_log/train/%s/visualization/c1200_out_gray' % exp
+    save_dir = '../STDAN_modified/exp_log/train/%s/visualization/c1200_out_ssim' % exp
     gt_paths = ['../dataset/GOPRO_Large/test', '../dataset/BSD_3ms24ms/test']
     #########
 

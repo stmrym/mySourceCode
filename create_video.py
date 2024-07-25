@@ -46,11 +46,11 @@ def create_mp4(path: str, savename: str) -> None:
 
 if __name__ == '__main__':
 
-    # path = '../dataset/BSD_3ms24ms/test/004/Blur/RGB'
-    path = '../dataset/GOPRO_Large/test/GOPR0862_11_00/blur_gamma'
+    path = '../dataset/BSD_3ms24ms/test/074/Blur/RGB'
+    # path = '../dataset/GOPRO_Large/test/GOPR0862_11_00/blur_gamma'
 
     # savename = '../dataset/0306-222113.gif'
-    savename = '../dataset/GOPR0862_11_00.mp4'
+    savename = '../dataset/074.mp4'
 
 
     create_mp4(path, savename)

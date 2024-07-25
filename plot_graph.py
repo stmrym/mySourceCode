@@ -38,7 +38,6 @@ plot_list = [
 
     dataPlot(
         exp_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv',
-        c = 'gray',
         ls = ':',
         lw = 1.0,
         metric_type = 'SSIM',
@@ -51,7 +50,7 @@ plot_list = [
         ls = ':',
         lw = 1.0,
         metric_type = 'SSIM',
-        label = 'STDAN $S$',
+        label = 'STDAN (mixed) $S$',
         plot_func = 'plot'
         ),
     dataPlot(
@@ -60,26 +59,26 @@ plot_list = [
         ls = ':',
         lw = 1.0,
         metric_type = 'masked_SSIM',
-        label='STDAN $S_m$',
+        label='STDAN (mixed) $S_m$',
         plot_func = 'plot'
         ),
 
     dataPlot(
-        exp_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv',
+        exp_path = '../STDAN_modified/exp_log/train/2024-07-17T094452__STDAN_BSD_3ms24ms/visualization/c1200_out_ssim/metrics_csv',
         c = 'black',
         ls = '-',
         lw = 1.0,
         metric_type = 'SSIM',
-        label = 'ESTDANv2 $S$',
+        label = 'STDAN (BSD) $S$',
         plot_func = 'plot'
         ),
     dataPlot(
-        exp_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv',
+        exp_path = '../STDAN_modified/exp_log/train/2024-07-17T094452__STDAN_BSD_3ms24ms/visualization/c1200_out_ssim/metrics_csv',
         c = 'red',
         ls = '-',
         lw = 1.0,
         metric_type = 'masked_SSIM',
-        label='ESTDANv2 $S_m$',
+        label='STDAN (BSD) $S_m$',
         plot_func = 'plot'
         )
 ]
@@ -105,7 +104,7 @@ plot_list = [
 # ]
 
 metric = 'SSIM'
-savepath = '../STDAN_modified/debug_results/STDAN_ESTDAN2_cir'      
+savepath = '../STDAN_modified/debug_results/STDAN_mixed_vs_STDAN_BSD'      
 
 csv_path_list = sorted(glob.glob(os.path.join(plot_list[0].exp_path, '*.csv')))
 seq_list = [os.path.splitext(os.path.basename(csv_path))[0] for csv_path in csv_path_list]
