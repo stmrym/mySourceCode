@@ -6,14 +6,19 @@ from tqdm import tqdm
 from graph_util import plot_heatmap, cv2_heatmap, cv2_alpha_heatmap
 from skimage.util.arraycrop import crop
 from skimage.metrics import structural_similarity as ssim
+from typing import List
 
-
-def visualize_flow( npz_path: str, seq_select: str, save_base_dir: str, scale_k: float, mode: str, **kwargs):
-    
+def get_seq_list(seq_select: str, path: str) -> List[str]:
     if seq_select == 'all': # for all sequences
-        seq_list = sorted([os.path.splitext(os.path.basename(file))[0] for file in glob.glob(npz_path.replace('%s', '*'))])
+        seq_list = sorted([os.path.splitext(os.path.basename(file))[0] for file in glob.glob(path.replace('%s', '*'))])
     else:                   # for a sequence
         seq_list = [seq_select]
+    return seq_list
+
+
+def visualize_flow(npz_path: str, seq_select: str, save_base_dir: str, scale_k: float, mode: str, **kwargs):
+    
+    seq_list = get_seq_list(seq_select, npz_path) 
 
     for seq in seq_list:
         print(seq)
@@ -68,16 +73,36 @@ def visualize_flow( npz_path: str, seq_select: str, save_base_dir: str, scale_k:
                 elif mode == 'img':
                     cv2_heatmap(image=flow_mag, save_name=save_name, cmap=cv2.COLORMAP_PLASMA)
 
+def visualize_blur_map(npz_forward_path: str, npz_backward_path: str, seq_select: str, save_base_dir: str, t: int = 48, **kwargs):
+
+    seq_list = get_seq_list(seq_select, npz_forward_path)
+
+    for seq in seq_list:
+        flow_forward_npz = np.load(npz_forward_path % seq)
+        flow_backward_npz = np.load(npz_backward_path % seq)
+        save_dir = os.path.join(save_base_dir, seq)
+        
+        if not os.path.isdir(save_dir):
+            os.makedirs(save_dir, exist_ok=True)
+
+        for i in tqdm(range(len(flow_backward_npz.files) - 1)):
+
+            flow_forward = flow_forward_npz[flow_forward_npz.files[i+1]]
+            flow_backward = flow_backward_npz[flow_backward_npz.files[i]]
+
+            blur_map = (np.sum(flow_forward**2, axis=-1) + np.sum(flow_backward**2, axis=-1))/2
+            
+            # plot_heatmap(plot_data=flow_forward[:,:,0], save_name=save_dir + '/forward_' + basename, cmap='plasma', vmin=-50, vmax=50)
+            # plot_heatmap(plot_data=flow_backward[:,:,0], save_name=save_dir + '/backward_' + basename, cmap='plasma', vmin=-50, vmax=50)
+            plot_heatmap(plot_data=blur_map, save_name=save_dir + '/' + flow_forward_npz.files[i+1], cmap='plasma', vmin=0, vmax=10000)
+
 
 
 def visualize_weighted_ssim_map(npz_path: str, output_path: str, gt_path: str, seq_select: str, save_base_dir: str, scale_k: float, **kwargs):
     
     mode = kwargs.pop('mode', 'img')
     
-    if seq_select == 'all': # for all sequences
-        seq_list = sorted([os.path.splitext(os.path.basename(file))[0] for file in glob.glob(npz_path.replace('%s', '*'))])
-    else:                   # for a sequence
-        seq_list = [seq_select]
+    seq_list = get_seq_list(seq_select, npz_path)
 
     for seq in seq_list:
         flow_npz = np.load(npz_path % seq)
@@ -125,10 +150,12 @@ def visualize_weighted_ssim_map(npz_path: str, output_path: str, gt_path: str, s
 if __name__ == '__main__':
 
     kwargs = {   
-        # 'npz_path' : '../dataset/GOPRO_Large/flow_sharp/%s.npz',
+        'npz_forward_path' : '../dataset/BSD_3ms24ms/flow_blur_forward/%s.npz',
+        'npz_backward_path' : '../dataset/BSD_3ms24ms/flow_blur_backward/%s.npz',
+
         'npz_path' : '../dataset/BSD_3ms24ms/flow_sharp/%s.npz',
         'seq_select' : 'all',
-        'save_base_dir' : '../dataset/BSD_3ms24ms/ssim_map_cir',
+        'save_base_dir' : '../dataset/BSD_3ms24ms/blur_map',
         # 'save_base_dir' : '../dataset/GOPRO_Large/ssim_map_cir',
         # 'save_base_dir' : '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization',
         'output_path' : '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/epoch-1200_output',
@@ -142,6 +169,6 @@ if __name__ == '__main__':
     }
 
     # visualize_flow(**kwargs)
-    visualize_weighted_ssim_map(**kwargs)
-    
+    # visualize_weighted_ssim_map(**kwargs)
+    visualize_blur_map(**kwargs)
 

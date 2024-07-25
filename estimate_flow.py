@@ -29,25 +29,38 @@ class Flow_estimator:
 
 def flow_estimate_batch(flow_estimator: Flow_estimator,
                         frame_list: Sequence[str],
-                        save_name: str,
+                        save_base_dir: str,
+                        seq: int,
                         batch_size: int = 1,
                         ) -> None:
     # make batch and save estimated flow to .npy file
     # flow_estimator: Instance of Flow_estimator
-    # frame_list: List of image files [img1, img2, ...]
-    flows_dict = {}
+    # frame_list: List of image files [img1, img2, ...]    
+    flows_forward_dict = {}
+    flows_backward_dict = {}
+
+    # flows_forward['000.png'] : flow 000 -> 001
+    # flows_backward['000.png'] : flow 001 -> 000
 
     for i in tqdm(range(0, len(frame_list) - 1, batch_size)):
         frame_batch_1 = frame_list[i : i+batch_size]
         frame_batch_2 = frame_list[i+1 : i+batch_size+1]
         valids = [None for _ in range(len(frame_batch_1))]
 
-        flow_batch = flow_estimator.estimate(frame_batch_1, frame_batch_2, valids)
+        flow_forward_batch = flow_estimator.estimate(frame_batch_1, frame_batch_2, valids)
+        flow_backward_batch = flow_estimator.estimate(frame_batch_2, frame_batch_1, valids)
+
         basename_list = [os.path.basename(batch) for batch in frame_batch_1]
         
-        flows_dict = dict(**flows_dict, **dict(zip(basename_list, [flow['flow'] for flow in flow_batch])))
-                
-    np.savez(save_name, **flows_dict)
+        # Add flow to dict
+        flows_forward_dict = dict(**flows_forward_dict, **dict(zip(basename_list, [flow['flow'] for flow in flow_forward_batch])))
+        flows_backward_dict = dict(**flows_backward_dict, **dict(zip(basename_list, [flow['flow'] for flow in flow_backward_batch])))
+
+        save_name_forward = os.path.join(save_base_dir + '_forward', seq) + '.npz'  
+        save_name_backward = os.path.join(save_base_dir + '_backward', seq) + '.npz'  
+
+    np.savez(save_name_forward, **flows_forward_dict)
+    np.savez(save_name_backward, **flows_backward_dict)
     
 
 
@@ -58,10 +71,10 @@ if __name__ == '__main__':
     config_file = '../STDAN_modified/mmflow/configs/raft/raft_8x2_100k_mixed_368x768.py'
     checkpoint_file = '../STDAN_modified/mmflow/checkpoints/raft_8x2_100k_mixed_368x768.pth'
     device = 'cuda:0'
-    path = '../dataset/GOPRO_Large/test/%s/sharp'
+    path = '../dataset/BSD_3ms24ms/test/%s/Blur/RGB'
     # seq_select = '128'
-    seq_select = 'all'
-    save_base_dir = '../dataset/GOPRO_Large/flow_sharp'
+    seq_select = '000'
+    save_base_dir = '../dataset/BSD_3ms24ms/flow_blur'
     batch_size = 8
     #######
 
@@ -74,16 +87,19 @@ if __name__ == '__main__':
     # Initialize flow estimator
     flow_estimator = Flow_estimator(config_file, checkpoint_file, device=device) 
 
+    forward_dir = save_base_dir + '_forward'
+    backward_dir = save_base_dir + '_backward'
+    if not os.path.isdir(forward_dir):
+        os.makedirs(forward_dir, exist_ok=True)
+    if not os.path.isdir(backward_dir):
+        os.makedirs(backward_dir, exist_ok=True)
+
     for seq in seq_list:
         seq_path = path % seq
         print(seq_path)    
-
-        if not os.path.isdir(save_base_dir):
-            os.makedirs(save_base_dir, exist_ok=True)
         
-        save_name = os.path.join(save_base_dir, seq) + '.npz'
         frame_list = sorted(glob.glob(os.path.join(seq_path, '*.png')))
 
-        flow_estimate_batch(flow_estimator, frame_list, save_name, batch_size)
+        flow_estimate_batch(flow_estimator, frame_list, save_base_dir, seq, batch_size)
     
 
