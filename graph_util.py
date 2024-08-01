@@ -6,17 +6,19 @@ from multiprocessing import Pool
 
 def _plot(plot_data: np.ndarray, save_name: str, cmap: str, **kwargs):
     # Initialize plt        
-    fig, ax = plt.subplots(dpi=300)
+    plt.rcParams["font.size"] = 18
+    fig, ax = plt.subplots(dpi=100, tight_layout=True)
     im = ax.imshow(plot_data, cmap=cmap, **kwargs)
     # im = ax.imshow(plot_data, cmap=cmap)
     # ax.axis("off")
     divider = mpl_toolkits.axes_grid1.make_axes_locatable(ax)
-    cax = divider.append_axes('right', '5%', pad='3%')
+    cax = divider.append_axes('bottom', size='5%', pad='15%')
 
-    fig.colorbar(im, cax=cax)
+    fig.colorbar(im, cax=cax, orientation='horizontal')
     plt.tight_layout()
-    fig.patch.set_alpha(0)
-    plt.savefig(save_name)
+    # fig.patch.set_alpha(0)
+    fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
+    plt.savefig(save_name, bbox_inches='tight', pad_inches=0.04)
 
 def _plot_wrapper(kwargs):
     return _plot(**kwargs)

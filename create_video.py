@@ -32,12 +32,12 @@ def create_mp4(path: str, savename: str) -> None:
 
     img0 = cv2.imread(file_list[0])
     h, w, _ = img0.shape
-    k = 4
+    k = 1
 
     fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')                                                                                                                                                         
     video = cv2.VideoWriter(savename,fourcc, 15., (w//k, h//k))                                                                                                                                                
                                                                                                                                                                                                             
-    for fname in file_list:                                                                                                                                                                                  
+    for fname in tqdm(file_list):                                                                                                                                                                                  
         img = cv2.imread(fname)     
         img = cv2.resize(img, (w//k, h//k))                                                                                                                                                                            
         video.write(img)                                                                                                                                                                                        
@@ -46,11 +46,13 @@ def create_mp4(path: str, savename: str) -> None:
 
 if __name__ == '__main__':
 
-    path = '../dataset/BSD_3ms24ms/test/074/Blur/RGB'
+    # path = '../dataset/BSD_3ms24ms/test/074/Blur/RGB'
     # path = '../dataset/GOPRO_Large/test/GOPR0862_11_00/blur_gamma'
+    # path = '../dualBR/output/GOPRO-VFI_copy/GOPR0384_11_05/RGB'
+    path = '../dataset/GOPRO-VFI_copy/test/GOPR0384_11_05/RS/RGB'
 
     # savename = '../dataset/0306-222113.gif'
-    savename = '../dataset/074.mp4'
-
+    # savename = '../dualBR/output/GOPRO-VFI_copy/GOPR0384_11_05.mp4'
+    savename = '../dataset/GOPRO-VFI_copy/test/GOPR0384_11_05_RS.mp4'
 
     create_mp4(path, savename)
