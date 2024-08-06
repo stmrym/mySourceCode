@@ -129,8 +129,8 @@ def visualize_weighted_ssim_map(npz_path: str, output_path: str, gt_path: str, s
                 # print(flow_mag.max(), flow_mag.min())
                 flow_mag = np.clip(flow_mag, None, 1)  
                 
-                mask = flow_mag * ssim_map  
-                # mask = (1 - flow_mag) * ssim_map  
+                # mask = flow_mag * ssim_map  
+                mask = (1 - flow_mag) * ssim_map  
 
 
                 ssim_map_save_name = os.path.join(save_base_dir, seq + '_ssim_map')
@@ -156,20 +156,20 @@ if __name__ == '__main__':
 
         'npz_path' : '../dataset/BSD_3ms24ms/flow_sharp/%s.npz',
         'seq_select' : '128',
-        'save_base_dir' : '../dataset/BSD_3ms24ms/access',
+        'save_base_dir' : '../dataset/BSD_3ms24ms/access_weighted',
         # 'save_base_dir' : '../dataset/GOPRO_Large/ssim_map_cir',
         # 'save_base_dir' : '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization',
         'output_path' : '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/epoch-1200_output',
         'gt_path' : '../dataset/BSD_3ms24ms/test/%s/Sharp/RGB',
         # 'gt_path' : '../dataset/GOPRO_Large/test/%s/sharp',
         'scale_k' : 0.10,
-        'mode' : 'fig',
+        'mode' : 'img',
         # 'alpha': 0.5,
         # 'beta' : 64, 
         'alpha_img_path': '../dataset/BSD_3ms24ms/test/%s/Blur/RGB' 
     }
 
-    visualize_flow(**kwargs)
-    # visualize_weighted_ssim_map(**kwargs)
+    # visualize_flow(**kwargs)
+    visualize_weighted_ssim_map(**kwargs)
     # visualize_blur_map(**kwargs)
 
