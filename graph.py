@@ -81,7 +81,7 @@ def plot_si_vs_sm():
         dataPlot(
                 csv_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
                 csv_avg_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
-                label = 'STDAN (BSD)',
+                label = 'STDAN',
                 c = 'blue',
                 marker = '.',
                 s = 5,
@@ -94,7 +94,7 @@ def plot_si_vs_sm():
         dataPlot(
                 csv_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
                 csv_avg_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
-                label = r'ESTDAN + $\mathcal{L}_\mathrm{f}$ (BSD)',
+                label = r'ESTDAN + $\mathcal{L}_\mathrm{f}$ (Ours)',
                 c = 'red',
                 marker = '.',
                 s = 5,
