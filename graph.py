@@ -54,11 +54,6 @@ class dataPlot():
         print(self.x_data, self.y_data)
         print(len(self.x_data), len(self.y_data))
 
-    def scatter_plot(self, ax):
-        # self.x_data = np.tan(self.x_data * np.pi / 2)
-        # self.y_data = np.tan(self.y_data * np.pi / 2)
-        ax.scatter(self.x_data, self.y_data, label=self.label, **self.kwargs)
-
     def read_avg_csv_append_list(self):
         csv = self.csv_avg_path
         df = pd.read_csv(csv, index_col=0)
@@ -74,18 +69,40 @@ class dataPlot():
             self.y_data = np.concatenate([self.y_data, df['GOPR0384_11_00':'GOPR0881_11_01']['avgi_masked_SSIM'].values])
 
 
+    def scatter_plot(self, ax):
+        # self.x_data = np.tan(self.x_data * np.pi / 2)
+        # self.y_data = np.tan(self.y_data * np.pi / 2)
+        ax.scatter(self.x_data, self.y_data, label=self.label, **self.kwargs)
+
+    def ecdf_plot(self, ax):
+
+        ssim_data = np.sort(self.x_data + self.y_data)
+        sorted_x_data = np.sort(self.x_data)
+        sorted_y_data = np.sort(self.y_data)
+
+        n = len(self.x_data)
+        cdf = np.arange(1, n+1)/n
+
+        # ax.plot(ssim_data, cdf, label=self.label, **self.kwargs)
+        ax.plot(sorted_x_data, cdf, label=self.label, linestyle='-', **self.kwargs)
+        # ax.plot(sorted_y_data, cdf, label=self.label, linestyle = '-', **self.kwargs)
+        # ax.plot(ssim_data, cdf, label=self.label, linestyle = '-', **self.kwargs)
+
+
+
 def plot_si_vs_sm():
 
     class_list = [
 
+        # for CDF
         dataPlot(
                 csv_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
                 csv_avg_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
                 label = 'STDAN',
                 c = 'blue',
-                marker = '.',
-                s = 5,
-                linewidths = 1,
+                # marker = '.',
+                # s = 5,
+                # linewidths = 1,
                 # facecolor = 'None',
                 # edgecolors = 'blue'
                 ),
@@ -96,60 +113,85 @@ def plot_si_vs_sm():
                 csv_avg_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
                 label = r'ESTDAN + $\mathcal{L}_\mathrm{f}$ (Ours)',
                 c = 'red',
-                marker = '.',
-                s = 5,
-                linewidths = 1,
+                # marker = '.',
+                # s = 5,
+                # linewidths = 1,
                 # facecolor = 'None',
                 # edgecolors = 'red'
                 ),  
 
+        # for scatterplot
+        # dataPlot(
+        #         csv_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
+        #         csv_avg_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
+        #         label = 'STDAN',
+        #         c = 'blue',
+        #         marker = '.',
+        #         s = 5,
+        #         linewidths = 1,
+        #         # facecolor = 'None',
+        #         # edgecolors = 'blue'
+        #         ),
+
+
+        # dataPlot(
+        #         csv_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
+        #         csv_avg_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
+        #         label = r'ESTDAN + $\mathcal{L}_\mathrm{f}$ (Ours)',
+        #         c = 'red',
+        #         marker = '.',
+        #         s = 5,
+        #         linewidths = 1,
+        #         # facecolor = 'None',
+        #         # edgecolors = 'red'
+        #         ),  
 
         # dataPlot(
         #         csv_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
         #         csv_avg_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
         #         label = 'STDAN (BSD)',
-        #         c = 'blue',
+        #         # c = 'blue',
         #         marker = '.',
         #         s = 100,
         #         linewidths = 1,
-        #         # facecolor = 'None',
-        #         # edgecolors = 'blue'
+        #         facecolor = 'None',
+        #         edgecolors = 'blue'
         #         ),
 
         # dataPlot(
         #         csv_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/GOPR*.csv',
         #         csv_avg_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
         #         label = 'STDAN (GoPro)',
-        #         c = 'blue',
+        #         # c = 'blue',
         #         marker = '^',
         #         s = 30,
         #         linewidths = 1,
-        #         # facecolor = 'None',
-        #         # edgecolors = 'blue'
+        #         facecolor = 'None',
+        #         edgecolors = 'blue'
         #         ),
 
         # dataPlot(
         #         csv_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
         #         csv_avg_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
         #         label = r'ESTDAN + $\mathcal{L}_\mathrm{f}$ (BSD)',
-        #         c = 'red',
+        #         # c = 'red',
         #         marker = '.',
         #         s = 100,
         #         linewidths = 1,
-        #         # facecolor = 'None',
-        #         # edgecolors = 'red'
+        #         facecolor = 'None',
+        #         edgecolors = 'red'
         #         ),  
                 
         # dataPlot(
         #         csv_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/GOPR*.csv',
         #         csv_avg_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
         #         label = r'ESTDAN + $\mathcal{L}_\mathrm{f}$ (GoPro)',
-        #         c = 'red',
+        #         # c = 'red',
         #         marker = '^',
         #         s = 30,
         #         linewidths = 1,
-        #         # facecolor = 'None',
-        #         # edgecolors = 'red'
+        #         facecolor = 'None',
+        #         edgecolors = 'red'
         #         ),   
     ]
 
@@ -158,23 +200,35 @@ def plot_si_vs_sm():
     plt.rcParams["font.size"] = 13
     plt.rcParams['xtick.direction'] = 'in'
     plt.rcParams['ytick.direction'] = 'in'
-    fig, ax = plt.subplots(dpi=300, tight_layout=True)
+    fig, ax = plt.subplots(dpi=200, tight_layout=True)
 
-    ax.axline((0,1), (1,0), color='black', lw=0.8)
+    # ax.axline((0,1), (1,0), color='black', lw=0.8)
     for data_inst in class_list:
         data_inst.read_csv_append_list()
         # data_inst.read_avg_csv_append_list()
-        data_inst.scatter_plot(ax)
-    # im = ax.imshow(plot_data, cmap=cmap)
-    # ax.axis("off")
-    ax.set_xlabel(r'Motion-Weighted $\mathrm{SSIM_m}$', fontsize=16)
-    ax.set_ylabel(r'Inverse Motion-Weighted $\mathrm{SSIM_i}$', fontsize=16)
-    ax.legend(markerscale = 4)
+        # data_inst.scatter_plot(ax)
+        data_inst.ecdf_plot(ax)
+
+    # ax.set_xlabel(r'Motion-Weighted $\mathrm{SSIM_m}$', fontsize=16)
+    # ax.set_ylabel(r'Inverse Motion-Weighted $\mathrm{SSIM_i}$', fontsize=16)
+    
+
+    ax.set_xticks(np.linspace(0, 1.0, 11), minor=True)
+    ax.set_yticks(np.linspace(0, 1.0, 11), minor=True)
+    
+    # ax.set_xlim([0,1.0])
+    # ax.set_ylim([0,1.0])
+    ax.set_xlabel(r'$\mathrm{SSIM_m}$', fontsize=16)
+    ax.set_ylabel(r'Empirical Distribution Function', fontsize=16)
+
+    # ax.legend(markerscale = 4)
+    ax.legend(markerscale = 1)
     ax.set_aspect('equal')
+    ax.grid(alpha=0.4)
     plt.tight_layout()
     # fig.patch.set_alpha(0)
     fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
-    plt.savefig('scatter.png', bbox_inches='tight', pad_inches=0.04)
+    plt.savefig('ecdf.png', bbox_inches='tight', pad_inches=0.04)
 
 
 
