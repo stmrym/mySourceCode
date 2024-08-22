@@ -4,6 +4,20 @@ import numpy as np
 from typing import List
 
 
+def clip_image() -> None:
+
+    path = '/mnt/d/results/SIP_202408/presentation_fig/000019_b.png'
+    save_path = '/mnt/d/results/SIP_202408/presentation_fig/000019_b_clip.png'
+
+    img = cv2.imread(path)
+    h, w, _ = img.shape
+    cut_size = int(640/480 * np.minimum(h, w))
+
+    clipped_image = img[:,(w-cut_size)//2:(w-cut_size)//2 + cut_size,:]
+
+    print(clipped_image.shape)
+    cv2.imwrite(save_path, clipped_image)
+    
 
 def add_patch_inside(path: str, save_name: str, thick_size: int, scale_list: List[float], loc_list: List[str], xywh_list: List[tuple], color_list: List[tuple], **kwargs) -> None:
     img = cv2.imread(path)
@@ -70,15 +84,15 @@ def add_patch_outside(path: str, save_name: str, thick_size: int, xywh_list: Lis
 
 if __name__ == '__main__':
 
-    name = '003012_b'
+    name = '00000143_e_woLf'
     kwargs = {
-        'path' : '/mnt/d/results/20240826_SIP/result_src/%s.png' % name,
-        'save_name' : '/mnt/d/results/20240826_SIP/result_fig/%s.png' % name,
+        'path' : '/mnt/d/results/SIP_202408/result_src/%s.png' % name,
+        'save_name' : '/mnt/d/results/SIP_202408/result_fig/%s.png' % name,
         'xywh_list' : [
             # 00000143
-            # (340, 270, 100, 60),
+            (340, 270, 100, 60),
             # 003012
-            (1000, 60, 150, 140),
+            # (1000, 60, 150, 140),
             # 00000020
             # (255, 200, 170, 90),
             # (470, 260, 140, 140),
@@ -90,8 +104,9 @@ if __name__ == '__main__':
         ],
         'thick_size' : 4,
         'scale_list' : [3.5,],
-        'loc_list': ['ul',]
+        'loc_list': ['ur',]
     }
 
     # add_patch_outside(**kwargs)
     add_patch_inside(**kwargs)
+    # clip_image()

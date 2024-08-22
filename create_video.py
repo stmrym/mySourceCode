@@ -25,34 +25,44 @@ def create_gif(path: str, savename: str) -> None:
 
     gifsicle(sources=savename, destination=savename ,optimize=False,colors=256,options=["--optimize=3"])
 
-def create_mp4(path: str, savename: str) -> None:
+def create_mp4(path: str, savename: str, seq: str = 'all') -> None:
 
-    file_list = sorted(glob.glob(os.path.join(path, '*.png')))
-    # file_list = file_list[2:-3]
+    if seq == 'all':
+        base_path = path.split('%s')[0]
+        seq_list = sorted([f for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))])
+    else:
+        seq_list = [seq]
+    print(seq_list)
 
-    img0 = cv2.imread(file_list[0])
-    h, w, _ = img0.shape
-    k = 1
+    for seq in seq_list:
+        file_list = sorted(glob.glob(os.path.join(path % seq, '*.png')))
+        # file_list = file_list[2:-3]
 
-    fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')                                                                                                                                                         
-    video = cv2.VideoWriter(savename,fourcc, 15., (w//k, h//k))                                                                                                                                                
-                                                                                                                                                                                                            
-    for fname in tqdm(file_list):                                                                                                                                                                                  
-        img = cv2.imread(fname)     
-        img = cv2.resize(img, (w//k, h//k))                                                                                                                                                                            
-        video.write(img)                                                                                                                                                                                        
-    video.release()
+        img0 = cv2.imread(file_list[0])
+        h, w, _ = img0.shape
+        k = 4
+
+        fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')                                                                                                                                                         
+        video = cv2.VideoWriter(savename % seq,fourcc, 15., (w//k, h//k))                                                                                                                                                
+                                                                                                                                                                                                                
+        for fname in tqdm(file_list):                                                                                                                                                                                  
+            img = cv2.imread(fname)     
+            img = cv2.resize(img, (w//k, h//k))                                                                                                                                                                            
+            video.write(img)                                                                                                                                                                                        
+        video.release()
 
 
 if __name__ == '__main__':
 
-    # path = '../dataset/BSD_3ms24ms/test/074/Blur/RGB'
+    path = '../dataset/BSD_3ms24ms/test/%s/Blur/RGB'
     # path = '../dataset/GOPRO_Large/test/GOPR0862_11_00/blur_gamma'
-    # path = '../dualBR/output/GOPRO-VFI_copy/GOPR0384_11_05/RGB'
-    path = '../dataset/GOPRO-VFI_copy/test/GOPR0384_11_05/RS/RGB'
+    # path = '../dualBR/output/realBR/%s/RGB'
+    # path = '../dualBR/output_pretrain/realBR/%s/RGB'
+    # path = '/mnt/d/dataset/realBR/test/%s/RS/RGB'
 
-    # savename = '../dataset/0306-222113.gif'
-    # savename = '../dualBR/output/GOPRO-VFI_copy/GOPR0384_11_05.mp4'
-    savename = '../dataset/GOPRO-VFI_copy/test/GOPR0384_11_05_RS.mp4'
+    savename = '../dataset/BSD_3ms24ms/%s.mp4'
+    # savename = '../dualBR/output/realBR/%s.mp4'
+    # savename = '../dualBR/output_pretrain/realBR/%s.mp4'
+    # savename = '/mnt/d/dataset/realBR/test/%s.mp4'
 
-    create_mp4(path, savename)
+    create_mp4(path, savename, seq='087')
