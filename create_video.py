@@ -43,7 +43,7 @@ def create_mp4(path: str, savename: str, seq: str = 'all') -> None:
         k = 4
 
         fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')                                                                                                                                                         
-        video = cv2.VideoWriter(savename % seq,fourcc, 15., (w//k, h//k))                                                                                                                                                
+        video = cv2.VideoWriter(savename % seq,fourcc, 10., (w//k, h//k))                                                                                                                                                
                                                                                                                                                                                                                 
         for fname in tqdm(file_list):                                                                                                                                                                                  
             img = cv2.imread(fname)     
@@ -54,15 +54,15 @@ def create_mp4(path: str, savename: str, seq: str = 'all') -> None:
 
 if __name__ == '__main__':
 
-    path = '../dataset/BSD_3ms24ms/test/%s/Blur/RGB'
+    # path = '../dataset/BSD_3ms24ms/test/%s/Blur/RGB'
     # path = '../dataset/GOPRO_Large/test/GOPR0862_11_00/blur_gamma'
     # path = '../dualBR/output/realBR/%s/RGB'
-    # path = '../dualBR/output_pretrain/realBR/%s/RGB'
+    path = '../dualBR/output/20240829_b4_1/realBR/%s/RGB'
     # path = '/mnt/d/dataset/realBR/test/%s/RS/RGB'
 
-    savename = '../dataset/BSD_3ms24ms/%s.mp4'
+    # savename = '../dataset/BSD_3ms24ms/%s.mp4'
     # savename = '../dualBR/output/realBR/%s.mp4'
-    # savename = '../dualBR/output_pretrain/realBR/%s.mp4'
+    savename = '../dualBR/output/20240829_b4_1/video/%s.mp4'
     # savename = '/mnt/d/dataset/realBR/test/%s.mp4'
 
-    create_mp4(path, savename, seq='087')
+    create_mp4(path, savename, seq='all')
