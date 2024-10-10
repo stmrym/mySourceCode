@@ -50,4 +50,4 @@ ax.grid()
 # ax.hist(x, bins='auto', alpha=0.5, histtype='stepfilled', label='N(0, N(0.1, 0.05))')
 # ax.legend()
 
-fig.savefig('fig2.png')
+fig.savefig('fig3.png')
