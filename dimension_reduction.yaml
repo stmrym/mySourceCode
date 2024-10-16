@@ -1,0 +1,29 @@
+# config for dimension_reduction.py
+
+seed: 0
+dir_path_dict:      
+  BSD: '../dataset/BSD_3ms24ms/test'
+  GOPRO: '../dataset/GOPRO_Large/test'
+label_type: 'ssim'  # 'dataset' or 'ssim'
+ssim_csv_path: '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out/metrics_csv'
+input_type: 'grayscale' # 'rgb', 'grayscale', 
+n_sample: 50
+crop_size: 480
+
+method:
+  name: 'tsne'
+  n_components: 2
+  random_state: 20
+  perplexity: 30
+
+graph:
+  savename: 'tsne_test'
+  plot_mode: 'plt' # 'plt' 'plotly'
+  add_image: True # for plot_mode == 'plt' only
+  zoom: 0.05
+  figsize: [8, 8]
+  dpi: 200
+  ssim_color: 'plasma'
+  labelcolor:
+    BSD: 'magenta'
+    GOPRO: 'cyan'
