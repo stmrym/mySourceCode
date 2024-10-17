@@ -1,14 +1,15 @@
 import yaml
 import random
-import os
 import re
 import numpy as np
+import pandas as pd
 from pathlib import Path
 from PIL import Image, ImageOps
 from tqdm import tqdm
 from matplotlib.figure import Figure as Mplfig
 from plotly.graph_objs._figure import Figure as Plotlyfig
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d import proj3d
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
@@ -19,11 +20,19 @@ from stop_watch import stop_watch
 
 class ImageData():
     def __init__(self, path, opt):
+        ''''
+        self.opt: {'key': value, ...}
+        self.path: Path('../.../basename.ext')
+        self.image: Image(path)
+        self.label: str('dataset_name')
+        self.ssim: float(ssim_value)
+        '''
         self.opt = opt
         self.path = path
         self.image = self._transform(Image.open(path))
+        assert self.opt['label_type'] in ['dataset', 'ssim']
         if self.opt['label_type'] == 'dataset':
-            self.label = self._find_matching_label(path, opt['dir_path_dict'].keys())
+            self.label = self._find_matching_label(str(path), opt['dir_path_dict'].keys())
         elif self.opt['label_type'] == 'ssim':
             self.label = self._find_ssim_from_csv(opt['ssim_csv_path'])
 
@@ -46,14 +55,19 @@ class ImageData():
 
     def _find_ssim_from_csv(self, csv_path):
         for dataset_prefix in self.opt['dir_path_dict'].values():
-            if self.path.startswith(dataset_prefix):
-                p = self.path[len(dataset_prefix):].split(os.sep)
-                seq = p[1]
-                frame = os.path.splitext(p[-1])[0]
+            try:
+                # p: Path('seq/.../basename.ext')
+                p = self.path.relative_to(Path(dataset_prefix))
+                seq = p.parts[0]
+                frame = p.stem
                 break
-        
-        
-        exit()
+            except ValueError:
+                continue
+
+        df = pd.read_csv((Path(csv_path) / seq).with_suffix('.csv'))
+        ssim = df.loc[df['frame'] == int(frame), 'SSIM'].values[0]
+        return ssim
+
 
 class DimReduction():
     def __init__(self, opt):
@@ -61,8 +75,10 @@ class DimReduction():
 
         self.path_l = []
         for dir_path in self.opt['dir_path_dict'].values():
-            paths = sorted([str(p) for p in Path(dir_path).glob('**/*.png') if re.search('blur_gamma|Blur', str(p))])
-            self.path_l += paths
+            seq_dir_path_l = sorted([dir for dir in Path(dir_path).iterdir() if dir.is_dir()])
+            for seq_dir in seq_dir_path_l:
+                paths = sorted([p for p in Path(seq_dir).glob('**/*.png') if re.search('blur_gamma|Blur', str(p))])
+                self.path_l += paths[1:-1]
 
         self.n_sample = self.opt.pop('n_sample', None)
         if not self.n_sample == None:
@@ -70,17 +86,10 @@ class DimReduction():
         else:
             self.path_l = self.path_l[0:100] # 0 300 3000 3200
 
-        self.image_l = []
-        self.label_l = []
+        self.imagedata_l = []
         for p in tqdm(self.path_l):
-            self.imagedata = ImageData(p, opt)
-            self.image_l.append(self._transform(Image.open(p)))
-            self.label_l.append(self._find_matching_label(p, self.opt['dir_path_dict'].keys()))
+            self.imagedata_l.append(ImageData(p, opt))
         
-
-            
-
-
         '''
         self.path_l: [Path(img1), Path(img2), ...]
         self.image_l: [(H, W, C), (H, W, C), ...]
@@ -88,31 +97,15 @@ class DimReduction():
         '''
             
 
-
-    def _make_ssim_list_from_csv(self):
-        seq_list = []
-        for path in self.path_l:
-            for dataset_prefix in self.opt['dir_path_dict'].values():
-                if path.startswith(dataset_prefix):
-                    p = path[len(dataset_prefix):].split(os.sep)
-                    print(p)
-                # seq_list += [str(p).lstrip(path) for p in self.path_l]
-        exit()
-        
-        csv_list = [str(p) for p in Path(self.opt['ssim_csv_path']).glob('*.csv')]
-        print(seq_list)
-        print(csv_list)
-        exit()
-
     @stop_watch
     def fit(self):
         # (N, H, W, C)
-        images_np = np.stack(self.image_l, axis=0)
+        images_np = np.stack([imagedata.image for imagedata in self.imagedata_l], axis=0)
         # images_np: (N, CHW)
         images_np = images_np.reshape(images_np.shape[0], -1)
         print(images_np.shape)
 
-        method = self.opt.pop('method')  
+        method = self.opt['method']  
         if method['name'] == 'tsne':
             from sklearn.manifold import TSNE
             tsne = TSNE(n_components=method['n_components'], perplexity=method['perplexity'], random_state=method['random_state'])
@@ -127,14 +120,16 @@ class DimReduction():
 
 
 class Graph():
-    def __init__(self, opt):   
+    def __init__(self, opt):
         self.graph_opt = opt['graph']
-        self.figsize = self.graph_opt.pop('figsize', (8,8))
+        self.dim = opt['method']['n_components']
+        self.label_type = opt['label_type']
+        self.figsize = self.graph_opt.pop('figsize', (8, 8))
         self.dpi = self.graph_opt.pop('dpi', 100)
         if self.graph_opt != 'plotly':
-            if opt['n_components'] == 2:
-                self.fig, self.ax = plt.subplots(figsize=self.figsize, dpi=self.dpi)
-            elif opt['n_components'] == 3:
+            if self.dim == 2:
+                self.fig, self.ax = plt.subplots()
+            elif self.dim == 3:
                 self.fig = plt.figure()
                 self.ax = self.fig.add_subplot(111, projection='3d')
 
@@ -153,27 +148,41 @@ class Graph():
                             pad=0)
         ax.add_artist(ab)
 
-    def _imscatter(self, reduced, image_l, color_l, zoom=0.1):
-        # images_np: [T, H, W, C]
-        im_list = [OffsetImage(ImageOps.expand(image.convert('RGB'), border=20, fill=color), zoom=zoom) for image, color in zip(image_l, color_l)]
-        x, y = np.atleast_1d(reduced[:,0], reduced[:,1])
-        artists = []
+    def _normalize(self, ndarray):
+        return (ndarray - ndarray.min()) / (ndarray.max() - ndarray.min())
 
-        if reduced.shape[1] == 2:
+    def _float_rgb_to_int(self, float_rgb):
+        int_rgb = tuple([int(rgb*255) for rgb in float_rgb])
+        return int_rgb
+
+    def _set_xyzlabel(self):
+        self.ax.set_xlabel('PC1')
+        self.ax.set_ylabel('PC2')    
+        if self.dim == 3:
+            self.ax.set_zlabel('PC3')        
+
+    def _imscatter(self, reduced, imagedata_l, color_l, cmap):
+        # images_np: [T, H, W, C]
+        if self.label_type == 'dataset':
+            rgb_color_l = color_l
+        elif self.label_type == 'ssim':    
+            rgb_color_l = [self._float_rgb_to_int(cmap(normalized)) for normalized in self._normalize(np.array(color_l))]
+        im_list = [OffsetImage(ImageOps.expand(imagedata.image.convert('RGB'), border=20, fill=color), zoom=self.graph_opt['zoom']) for imagedata, color in zip(imagedata_l, rgb_color_l)]
+        
+        x, y = np.atleast_1d(reduced[:,0], reduced[:,1])
+        z = np.atleast_1d(reduced[:,2]) if self.dim == 3 else None
+        scat = self.ax.scatter(x, y, z, s=self.graph_opt['markersize'], alpha=self.graph_opt['alpha'], c=color_l, cmap=cmap, marker="o")
+        self._set_xyzlabel()
+
+        if self.dim == 2:            
             for x0, y0, im in zip(x, y, im_list):
                 ab = AnnotationBbox(im, (x0, y0), xycoords='data', frameon=False)
-                # artists.append(self.ax.add_artist(ab))
                 self.ax.add_artist(ab)
             self.ax.update_datalim(np.column_stack([x, y]))
-            self.ax.set_xlabel('PC1')
-            self.ax.set_ylabel('PC2')
-            self.ax.autoscale()
+            self.fig.colorbar(scat, ax=self.ax) 
 
-        elif reduced.shape[1] == 3:
+        elif self.dim == 3:
             # Create a second axes to place annotations
-            z = np.atleast_1d(reduced[:,2])
-            
-            self.ax.scatter(x, y, z, marker="o")
             self.ax2 = self.fig.add_subplot(111,frame_on=False) 
             self.ax2.axis("off")
             self.ax2.axis([0,1,0,1])
@@ -183,60 +192,63 @@ class Graph():
                 im.image.axes = self.ax2
                 ab = AnnotationBbox(im, [X, Y], xybox=(0,0),xycoords='data', 
                                     boxcoords="offset points",pad=0)
-                self.ax2.add_artist(ab)
-            
-            self.ax.set_xlabel('PC1')
-            self.ax.set_ylabel('PC2')            
-            self.ax.set_zlabel('PC3')
-            # self.ax.autoscale()             
-        return artists
+                self.ax2.add_artist(ab)  
     
-    def _scatter(self, reduced, color_l):
-        if reduced.shape[1] == 2:
-            print('plt.scatter(2D) mode')
-            self.ax.scatter(reduced[:,0], reduced[:,1], color=color_l, linewidths=1)
-            self.ax.set_xlabel('PC1')
-            self.ax.set_ylabel('PC2')
-            self.ax.autoscale()
 
-        elif reduced.shape[1] == 3:
-            print('plt.scatter(3D) mode')
-            self.ax.scatter(reduced[:,0], reduced[:,1], reduced[:,2], color=color_l, linewidths=1)
-            self.ax.set_xlabel('PC1')
-            self.ax.set_ylabel('PC2')
-            self.ax.set_zlabel('PC3')
-            self.ax.autoscale()
-            
+    def _scatter(self, reduced, color_l, cmap):
+        
+        print('plt.scatter mode')
+        x, y = np.atleast_1d(reduced[:,0], reduced[:,1])
+        z = np.atleast_1d(reduced[:,2]) if self.dim == 3 else None
+        pad = 0.11 if reduced.shape[1] == 3 else 0.04
 
-    def _goscatter(self, reduced, color_l):
-        if reduced.shape[1] == 2:
-            print('go.Scatter2d mode')
-            self.fig = go.Figure(data=[go.Scatter(x=reduced[:,0], y=reduced[:,1], mode='markers', marker=dict(
-                    size=5, color=color_l
-                ))])
-        elif reduced.shape[1] == 3:
-            print('go.Scatter3d mode')
-            self.fig = go.Figure(data=[go.Scatter3d(x=reduced[:,0], y=reduced[:,1], z=reduced[:,2], mode='markers', marker=dict(
-                size=5, color=color_l
-                ))])
+        scatter_params = {k: self.graph_opt[k] for k in ['s', 'alpha', 'marker'] if k in self.graph_opt}
 
-    def plot(self, reduced, image_l, label_l):
+        if self.dim == 2:
+            scat = self.ax.scatter(x, y, c=color_l, cmap=cmap, **scatter_params)
+        elif self.dim == 3:
+            scat = self.ax.scatter(x, y, z, c=color_l, cmap=cmap, **scatter_params)
+
+        self.fig.colorbar(scat, ax=self.ax, pad=pad)  
+        self._set_xyzlabel()
+
+
+    def _goscatter(self, reduced, color_l, cmap):
+
+        print('go.Scatter mode')
+        x, y = np.atleast_1d(reduced[:,0], reduced[:,1])
+        z = np.atleast_1d(reduced[:,2]) if self.dim == 3 else None
+
+        if self.dim == 2:
+            self.fig = go.Figure(data=[go.Scatter(x=x, y=y, mode='markers', marker=dict(size=5, color=color_l, colorscale=cmap))])
+        elif self.dim == 3:
+            self.fig = go.Figure(data=[go.Scatter3d(x=x, y=y, z=z, mode='markers', marker=dict(size=5, color=color_l, colorscale=cmap))])
+
+    def plot(self, reduced, imagedata_l):
         '''
         graph_opt: dict
         reduced: (N, d)
-        image_l: [(H, W, C), (H, W, C), ...]
-        label_l: ['BSD', 'GOPRO', ...]
+        imagedata_l: [Imagedata(path1), Imagedata(path2), ...]
         '''
         plot_mode = self.graph_opt.pop('plot_mode')
-        color_l = [self.graph_opt['labelcolor'][label] for label in label_l]
+
+        assert self.label_type in ['dataset', 'ssim']
+        if self.label_type == 'dataset':
+            # ['magenta', 'cyan', ...]
+            color_l = [self.graph_opt['label_color'][imagedata.label] for imagedata in imagedata_l]
+            cmap = None
+        elif self.label_type == 'ssim':
+            # [ssim1, ssim2, ...]
+            color_l = [imagedata.label for imagedata in imagedata_l]
+            cmap = plt.get_cmap(self.graph_opt['ssim_color'])
 
         if plot_mode == 'plt':
             if self.graph_opt['add_image']:
-                self._imscatter(reduced, image_l, color_l)
+                self._imscatter(reduced, imagedata_l, color_l, cmap)
             else:
-                self._scatter(reduced, color_l)
+                self._scatter(reduced, color_l, cmap)
         elif plot_mode == 'plotly':
-            self._goscatter(reduced, color_l)
+            self._goscatter(reduced, color_l, self.graph_opt['ssim_color'])
 
     def save(self):
         if isinstance(self.fig, Mplfig):
@@ -261,7 +273,7 @@ if __name__ == '__main__':
     # print(dr.reduced.shape)
 
     graph = Graph(opt)
-    graph.plot(dr.reduced, dr.image_l, dr.label_l)
+    graph.plot(dr.reduced, dr.imagedata_l)
     graph.save()
 
 
