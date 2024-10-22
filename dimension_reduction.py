@@ -29,17 +29,26 @@ class ImageData():
         '''
         self.opt = opt
         self.path = path
-        self.image = self._transform(Image.open(path))
+        self._crop_size = self.opt.get('crop_size', 480)
+        self.image = self._load_data(path)
         assert self.opt['label_type'] in ['dataset', 'ssim']
         if self.opt['label_type'] == 'dataset':
             self.label = self._find_matching_label(str(path), opt['dir_path_dict'].keys())
         elif self.opt['label_type'] == 'ssim':
             self.label = self._find_ssim_from_csv(opt['ssim_csv_path'])
 
+    def _load_data(self, path):
+        if path.suffix == '.npy':
+            image = self._transform(Image.fromarray(np.load(path)))
+        elif path.suffix == '.png':
+            image = self._transform(Image.open(path))
+        return image
+        
+
     def _transform(self, pil_img):
         if self.opt['input_type'] == 'grayscale':
             pil_img = pil_img.convert('L')
-        return self._crop_center(pil_img, self.opt.pop('crop_size', 480))
+        return self._crop_center(pil_img, self._crop_size)
     
     def _crop_center(self, pil_img, crop_size):
         w, h = pil_img.size
@@ -77,7 +86,8 @@ class DimReduction():
         for dir_path in self.opt['dir_path_dict'].values():
             seq_dir_path_l = sorted([dir for dir in Path(dir_path).iterdir() if dir.is_dir()])
             for seq_dir in seq_dir_path_l:
-                paths = sorted([p for p in Path(seq_dir).glob('**/*.png') if re.search('blur_gamma|Blur', str(p))])
+                # paths = sorted([p for p in Path(seq_dir).glob('**/*.png') if re.search('blur_gamma|Blur', str(p))])
+                paths = sorted([p for p in Path(seq_dir).rglob('*') if (re.search('blur_gamma|Blur', str(p))) or p.suffix == '.npy'])
                 self.path_l += paths[1:-1]
 
         self.n_sample = self.opt.pop('n_sample', None)
@@ -89,7 +99,7 @@ class DimReduction():
         self.imagedata_l = []
         for p in tqdm(self.path_l):
             self.imagedata_l.append(ImageData(p, opt))
-        
+
         '''
         self.path_l: [Path(img1), Path(img2), ...]
         self.image_l: [(H, W, C), (H, W, C), ...]
@@ -171,10 +181,10 @@ class Graph():
         
         x, y = np.atleast_1d(reduced[:,0], reduced[:,1])
         z = np.atleast_1d(reduced[:,2]) if self.dim == 3 else None
-        scat = self.ax.scatter(x, y, z, s=self.graph_opt['markersize'], alpha=self.graph_opt['alpha'], c=color_l, cmap=cmap, marker="o")
         self._set_xyzlabel()
 
         if self.dim == 2:            
+            scat = self.ax.scatter(x, y, s=self.graph_opt['s'], alpha=self.graph_opt['alpha'], c=color_l, cmap=cmap, marker="o")
             for x0, y0, im in zip(x, y, im_list):
                 ab = AnnotationBbox(im, (x0, y0), xycoords='data', frameon=False)
                 self.ax.add_artist(ab)
@@ -183,6 +193,7 @@ class Graph():
 
         elif self.dim == 3:
             # Create a second axes to place annotations
+            scat = self.ax.scatter(x, y, z, s=self.graph_opt['s'], alpha=self.graph_opt['alpha'], c=color_l, cmap=cmap, marker="o")
             self.ax2 = self.fig.add_subplot(111,frame_on=False) 
             self.ax2.axis("off")
             self.ax2.axis([0,1,0,1])

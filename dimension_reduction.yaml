@@ -2,13 +2,16 @@
 
 seed: 0
 dir_path_dict:      
-  BSD: '../dataset/BSD_3ms24ms/test'
-  GOPRO: '../dataset/GOPRO_Large/test'
-ssim_csv_path: '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out/metrics_csv'
+  # BSD: '../dataset/BSD_3ms24ms/test'
+  # GOPRO: '../dataset/GOPRO_Large/test'
+  BSD: '../BSSTNet/blur_map/BSD'
+  GOPRO: '../BSSTNet/blur_map/GOPRO'  
+# ssim_csv_path: '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out/metrics_csv'
+ssim_csv_path: '../STDAN_modified/exp_log/train/2024-06-02T124807_F_ESTDAN_v2_BSD_3ms24ms_GOPRO/visualization/epoch-1200_outcsv/metrics_csv'
 label_type: 'ssim'  # 'dataset' or 'ssim'
 input_type: 'grayscale' # 'rgb', 'grayscale', 
-crop_size: 480
-n_sample: 200
+crop_size: 120
+n_sample: 3000
 
 method:
   name: 'tsne'
@@ -17,10 +20,10 @@ method:
   perplexity: 30
 
 graph:
-  savename: 'tsne_test2'
+  savename: 'tsne_blur3'
   plot_mode: 'plt' # 'plt' 'plotly'
   figsize: None
-  s: 30
+  s: 10
   alpha: 0.8
   dpi: 300
   ssim_color: 'plasma'
@@ -28,4 +31,4 @@ graph:
     BSD: 'magenta'
     GOPRO: 'cyan'
   add_image: False # for plot_mode == 'plt' only
-  zoom: 0.01
+  zoom: 0.08
