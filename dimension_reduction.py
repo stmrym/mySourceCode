@@ -39,7 +39,12 @@ class ImageData():
 
     def _load_data(self, path):
         if path.suffix == '.npy':
-            image = self._transform(Image.fromarray(np.load(path)))
+            # npy = np.clip((np.load(path))*255, 0, 255).astype(np.uint8)
+            # npy = np.clip((np.load(path)), 0, 255).astype(np.uint8)
+            npy = np.load(path)
+
+            print(npy.max(), npy.min())
+            image = self._transform(Image.fromarray(npy))
         elif path.suffix == '.png':
             image = self._transform(Image.open(path))
         return image
@@ -67,12 +72,12 @@ class ImageData():
             try:
                 # p: Path('seq/.../basename.ext')
                 p = self.path.relative_to(Path(dataset_prefix))
-                seq = p.parts[0]
+                # seq = p.parts[0]
+                seq = p.parts[1]
                 frame = p.stem
                 break
             except ValueError:
                 continue
-
         df = pd.read_csv((Path(csv_path) / seq).with_suffix('.csv'))
         ssim = df.loc[df['frame'] == int(frame), 'SSIM'].values[0]
         return ssim
@@ -87,9 +92,10 @@ class DimReduction():
             seq_dir_path_l = sorted([dir for dir in Path(dir_path).iterdir() if dir.is_dir()])
             for seq_dir in seq_dir_path_l:
                 # paths = sorted([p for p in Path(seq_dir).glob('**/*.png') if re.search('blur_gamma|Blur', str(p))])
-                paths = sorted([p for p in Path(seq_dir).rglob('*') if (re.search('blur_gamma|Blur', str(p))) or p.suffix == '.npy'])
-                self.path_l += paths[1:-1]
-
+                # self.path_l += paths[1:-1]
+                paths = sorted([p for p in Path(seq_dir).glob('**/*.npy') if re.search('blur_gamma|Blur', str(p))])
+                self.path_l += paths
+        
         self.n_sample = self.opt.pop('n_sample', None)
         if not self.n_sample == None:
             self.path_l = random.sample(self.path_l, self.n_sample)
