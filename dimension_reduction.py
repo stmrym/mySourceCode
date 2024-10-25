@@ -39,11 +39,11 @@ class ImageData():
 
     def _load_data(self, path):
         if path.suffix == '.npy':
-            # npy = np.clip((np.load(path))*255, 0, 255).astype(np.uint8)
-            # npy = np.clip((np.load(path)), 0, 255).astype(np.uint8)
+            npy = np.clip((np.load(path))*255, 0, 255).astype(np.uint8)
+            npy = np.clip((np.load(path)), 0, 255).astype(np.uint8)
             npy = np.load(path)
-
             print(npy.max(), npy.min())
+
             image = self._transform(Image.fromarray(npy))
         elif path.suffix == '.png':
             image = self._transform(Image.open(path))
@@ -72,8 +72,8 @@ class ImageData():
             try:
                 # p: Path('seq/.../basename.ext')
                 p = self.path.relative_to(Path(dataset_prefix))
-                # seq = p.parts[0]
-                seq = p.parts[1]
+                seq = p.parts[0]
+                # seq = p.parts[1]
                 frame = p.stem
                 break
             except ValueError:
@@ -91,10 +91,10 @@ class DimReduction():
         for dir_path in self.opt['dir_path_dict'].values():
             seq_dir_path_l = sorted([dir for dir in Path(dir_path).iterdir() if dir.is_dir()])
             for seq_dir in seq_dir_path_l:
-                # paths = sorted([p for p in Path(seq_dir).glob('**/*.png') if re.search('blur_gamma|Blur', str(p))])
-                # self.path_l += paths[1:-1]
-                paths = sorted([p for p in Path(seq_dir).glob('**/*.npy') if re.search('blur_gamma|Blur', str(p))])
-                self.path_l += paths
+                paths = sorted([p for p in Path(seq_dir).glob('**/*.png') if re.search('blur_gamma|Blur', str(p))])
+                self.path_l += paths[1:-1]
+                # paths = sorted([p for p in Path(seq_dir).glob('**/*.npy') if re.search('blur_gamma|Blur', str(p))])
+                # self.path_l += paths
         
         self.n_sample = self.opt.pop('n_sample', None)
         if not self.n_sample == None:
@@ -126,8 +126,10 @@ class DimReduction():
             from sklearn.manifold import TSNE
             tsne = TSNE(n_components=method['n_components'], perplexity=method['perplexity'], random_state=method['random_state'])
             self.reduced = tsne.fit_transform(images_np)
-        elif method['name'] == 'pca':
-            pass
+        elif method['name'] == 'umap':
+            import umap
+            model = umap.UMAP(n_components=method['n_components'], n_neighbors=method['neighbors'], random_state=method['random_state'])
+            self.reduced = model.fit_transform(images_np)
 
         print(self.reduced.shape)
         # (N, d)

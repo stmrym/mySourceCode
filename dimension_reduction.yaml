@@ -2,25 +2,26 @@
 
 seed: 0
 dir_path_dict:      
-  # BSD: '../dataset/BSD_3ms24ms/test'
-  # GOPRO: '../dataset/GOPRO_Large/test'
-  BSD: '../BSSTNet/blur_map/BSD_3ms24ms/'
-  GOPRO: '../BSSTNet/blur_map/GOPRO_Large/'  
-ssim_csv_path: '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out/metrics_csv'
-# ssim_csv_path: '../STDAN_modified/exp_log/train/2024-06-02T124807_F_ESTDAN_v2_BSD_3ms24ms_GOPRO/visualization/epoch-1200_outcsv/metrics_csv'
+  BSD: '../dataset/BSD_3ms24ms/test'
+  GOPRO: '../dataset/GOPRO_Large/test'
+  # BSD: '../BSSTNet/blur_map/BSD_3ms24ms/'
+  # GOPRO: '../BSSTNet/blur_map/GOPRO_Large/'  
+# ssim_csv_path: '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out/metrics_csv'
+ssim_csv_path: '../STDAN_modified/exp_log/train/2024-06-02T124807_F_ESTDAN_v2_BSD_3ms24ms_GOPRO/visualization/epoch-1200_outcsv/metrics_csv'
 label_type: 'ssim'  # 'dataset' or 'ssim'
 input_type: 'grayscale' # 'rgb', 'grayscale', 
-crop_size: 120
-n_sample: 1000
+crop_size: 480
+n_sample: 4000
 
 method:
-  name: 'tsne'
-  n_components: 2
-  random_state: 20
-  perplexity: 30
+  name: 'umap'  # 'tsne', 'umap'
+  n_components: 2  
+  random_state: 20  
+  perplexity: 30  # for TSNE
+  neighbors: 10 # for UMAP
 
 graph:
-  savename: 'tsne_bm_clip_1000_F2'
+  savename: 'umap'
   plot_mode: 'plt' # 'plt' 'plotly'
   figsize: None
   s: 10
@@ -30,5 +31,5 @@ graph:
   label_color:
     BSD: 'magenta'
     GOPRO: 'cyan'
-  add_image: False # for plot_mode == 'plt' only
-  zoom: 0.05
+  add_image: True # for plot_mode == 'plt' only
+  zoom: 0.02
