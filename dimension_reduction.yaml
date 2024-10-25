@@ -18,10 +18,10 @@ method:
   n_components: 2  
   random_state: 20  
   perplexity: 30  # for TSNE
-  neighbors: 10 # for UMAP
+  neighbors: 20 # for UMAP
 
 graph:
-  savename: 'umap'
+  savename: 'umap_n10'
   plot_mode: 'plt' # 'plt' 'plotly'
   figsize: None
   s: 10
