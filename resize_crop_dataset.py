@@ -51,14 +51,14 @@ def crop(file_paths: list[str], base_dir:str, save_dir:str, start:tuple[int], en
 
 if __name__ == '__main__':
 
-    # base_dir = '../dataset/Mi11Lite/test'
-    # file_paths = sorted(glob.glob(os.path.join(base_dir, '*/*.png'), recursive=True))
-    # save_dir = '../dataset/Mi11Lite_cropped/test'
+    base_dir = '../dataset/Mi11Lite/test'
+    file_paths = sorted(glob.glob(os.path.join(base_dir, '*/*.png'), recursive=True))
+    save_dir = '../dataset/Mi11Lite_downx4/test'
 
-    base_dir = '/mnt/d/python'
-    file_paths = sorted(glob.glob(os.path.join(base_dir, '*.png'), recursive=True))
-    save_dir = '/mnt/d/python_2'
+    # base_dir = '/mnt/d/python'
+    # file_paths = sorted(glob.glob(os.path.join(base_dir, '*.png'), recursive=True))
+    # save_dir = '/mnt/d/python_2'
 
-    # resize(file_paths, base_dir, save_dir, (1280, 720))
+    resize(file_paths, base_dir, save_dir, (1280//4, 720//4))
     # crop_center(file_paths, base_dir, save_dir, (1280, 720))
-    crop(file_paths, base_dir, save_dir, (0, 40), (750, 520))
+    # crop(file_paths, base_dir, save_dir, (0, 40), (750, 520))
