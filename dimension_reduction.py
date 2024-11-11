@@ -1,3 +1,4 @@
+import json
 import yaml
 import random
 import re
@@ -35,7 +36,10 @@ class ImageData():
         if self.opt['label_type'] == 'dataset':
             self.label = self._find_matching_label(str(path), opt['dir_path_dict'].keys())
         elif self.opt['label_type'] == 'ssim':
-            self.label = self._find_ssim_from_csv(opt['ssim_csv_path'])
+            if self.opt['label_format'] == 'csv':
+                self.label = self._find_ssim_from_csv(opt['ssim_csv_path'])
+            elif self.opt['label_format'] == 'json':
+                self.label = self._find_ssim_from_json(opt['ssim_json_path'])
 
     def _load_data(self, path):
         if path.suffix == '.npy':
@@ -82,6 +86,12 @@ class ImageData():
         ssim = df.loc[df['frame'] == int(frame), 'SSIM'].values[0]
         return ssim
 
+    def _find_ssim_from_json(self, json_path):
+        with open(json_path, 'r') as f:
+            json_dict = json.load(f)
+        seq = self.path.parent
+        ssim = json_dict['SSIM'][seq][self.path.name]
+        return ssim
 
 class DimReduction():
     def __init__(self, opt):
