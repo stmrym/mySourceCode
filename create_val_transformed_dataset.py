@@ -23,9 +23,9 @@ def build_transforms(yaml_opt):
 
 if __name__ == '__main__':
     
-    base_tmpl = '../dataset/GOPRO_Large/test'
-    file_tmpl = 'blur_gamma'
-    dst_dir = '../dataset/GOPRO_Large_real/test/blur'
+    base_tmpl = '../dataset/BSD_2ms16ms_original/test'
+    file_tmpl = 'Blur/RGB'
+    dst_dir = '../dataset/BSD_2ms16ms_comp/test/blur'
 
 
     with open('create_val_transformed_dataset.yml', mode='r') as f:

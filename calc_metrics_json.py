@@ -18,7 +18,8 @@ def check_save_path(save_name):
         save_name = Path(save_name)
     save_parent = save_name.parent
     assert save_parent.exists() and save_parent.is_dir(), f'{save_parent} dir does not exist'
-    assert save_name.exists() and save_name.is_file(), f'{save_name} already exists'
+    print(save_name.exists(), save_name.is_file())
+    assert not save_name.exists(), f'{save_name} already exists'
 
 def build_metrics(yaml_opt):
     metric_dict = OrderedDict()
@@ -31,9 +32,21 @@ def build_metrics(yaml_opt):
 
 if __name__ == '__main__':
     
-    img1_base_path = '../BSSTNet/datasets/BSD_1ms8ms/test/blur'
-    img2_base_path = '../BSSTNet/datasets/BSD_1ms8ms/test/GT'
-    save_name = '../BSSTNet/datasets/BSD_1ms8ms/input.json'
+    # img1_base_path = '../BSSTNet/dataset/BSD_1ms8ms/test/blur'
+    # img2_base_path = '../BSSTNet/datasets/BSD_1ms8ms/test/GT'
+    # save_name = '../BSSTNet/datasets/BSD_1ms8ms/input.json'
+
+    img1_base_path = '../STDAN_modified/exp_log/test/2024-11-12T073940__CT_/epoch-0400_Mi11Lite_output/'
+    img2_base_path = '../dataset/Mi11Lite/test'
+    save_name = '../STDAN_modified/exp_log/test/2024-11-12T073940__CT_/epoch-0400_Mi11Lite_output.json'
+
+    # img1_base_path = '../dataset/BSD_1ms8ms_comp/test/blur'
+    # img2_base_path = '../dataset/BSD_1ms8ms/test/GT'
+    # save_name = '../dataset/BSD_1ms8ms_comp/input.json'
+
+    # img1_base_path = '../dataset/Mi11Lite/test'
+    # img2_base_path = '../dataset/Mi11Lite/test'
+    # save_name = '../dataset/Mi11Lite/input.json'
 
     check_save_path(save_name)
 
