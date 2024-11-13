@@ -126,6 +126,8 @@ class NIQE:
                 img = to_y_channel(img)
             elif self.convert_to == 'gray':
                 img = cv2.cvtColor(img / 255., cv2.COLOR_BGR2GRAY) * 255.
+            elif self.convert_to == 'l':
+                img = cv2.cvtColor(img / 255., cv2.COLOR_BGR2LAB)[0] * 255.
             img = np.squeeze(img)
 
         if self.crop_border != 0:
