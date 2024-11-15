@@ -41,8 +41,8 @@ def equalize_hist(img):
     return dst_img
 
 def change_constrast(img, alpha=1, beta=0):
-    dst_img = alpha*img.astype(np.float32) + beta
-    dst_img = np.clip(dst_img, 0, 255).astype(np.uint8)
+    dst_img = alpha*img + beta
+    dst_img = np.clip(dst_img*255, 0, 255).astype(np.uint8)
     return dst_img
 
 
@@ -55,14 +55,21 @@ def add_noise(img, noise):
 
 def main():
 
+    # 2024-11-12T073940__CT_
+    # 2024-11-12T080924__
+    # 2024-11-14T040540__STDAN_
 
-    path = '/mnt/d/results/20240410/F_a05_00092.png'
-    out_name = 'F_a05TOa1_00092.png'
+    # VID_20240523_165150   38
+    # VID_20240523_163120   81
+
+    path = '../STDAN_modified/exp_log/test/2024-11-14T040540__STDAN_/epoch-0400_Mi11Lite_output/VID_20240523_165150/00038.png'
+    out_name = '00038_stdan.png'
     
     img = cv2.imread(path).astype(np.float32)
+    img /= 255.
 
-    alpha = 1/0.5
-    beta = 0
+    alpha = 10**(-0.04)
+    beta = 0.06
     sigma = 20
 
     # img_yuv = cv2.cvtColor(img, cv2.COLOR_BGR2YUV)
@@ -74,7 +81,8 @@ def main():
     # dst_img = cv2.cvtColor(img_yuv, cv2.COLOR_YUV2BGR)
 
     dst_img = change_constrast(img, alpha=alpha, beta=beta)
-    
+    # dst_img = np.clip(img*255, 0, 255).astype(np.uint8)
+    dst_img = dst_img[50:550,750:1250,:]
     # noise = np.random.normal(0, sigma, img.shape)
     # dst_img = add_noise(img, noise = noise)
 
@@ -82,7 +90,7 @@ def main():
 
 
     # dst_img_yuv = cv2.cvtColor(dst_img, cv2.COLOR_BGR2YUV)
-    cv2.imwrite('/mnt/d/results/20240410/' + out_name, dst_img)
+    cv2.imwrite(out_name, dst_img)
     # plot_hist(dst_img_yuv.reshape(-1,3), '/mnt/d/results/20240403/' + out_name + '_yuv_out_hist.png', ver='yuv')
     # plot_hist(dst_img.reshape(-1,3), '/mnt/d/results/20240403/' + out_name + '_out_hist.png', ver='bgr')
 

@@ -4,6 +4,7 @@ import math
 import os
 import lpips
 from skimage.metrics import structural_similarity as compare_ssim
+from brisque import BRISQUE as CalcBRISQUE
 from scipy.ndimage.filters import convolve
 from scipy.special import gamma
 import torch
@@ -566,3 +567,11 @@ def niqe(img, mu_pris_param, cov_pris_param, gaussian_window, block_size_h=96, b
     quality = np.sqrt(quality)
     quality = float(np.squeeze(quality))
     return quality
+
+
+class BRISQUE(CalcBRISQUE):
+    def __init__(self):
+        super(BRISQUE, self).__init__()
+
+    def calculate(self, img1, **kwargs):
+        return self.get_score(img1)

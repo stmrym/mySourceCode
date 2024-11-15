@@ -57,12 +57,14 @@ if __name__ == '__main__':
     # path = '../dataset/BSD_3ms24ms/test/%s/Blur/RGB'
     # path = '../dataset/GOPRO_Large/test/GOPR0862_11_00/blur_gamma'
     # path = '../dualBR/output/realBR/%s/RGB'
-    path = '../dualBR/output/20240829_b4_1/realBR/%s/RGB'
+    # path = '../dualBR/output/20240829_b4_1/realBR/%s/RGB'
     # path = '/mnt/d/dataset/realBR/test/%s/RS/RGB'
+    path = '../STDAN_modified/exp_log/test/2024-11-12T073940__CT_/epoch-0400_BSD_1ms8ms_output/%s'
 
     # savename = '../dataset/BSD_3ms24ms/%s.mp4'
     # savename = '../dualBR/output/realBR/%s.mp4'
-    savename = '../dualBR/output/20240829_b4_1/video/%s.mp4'
+    # savename = '../dualBR/output/20240829_b4_1/video/%s.mp4'
     # savename = '/mnt/d/dataset/realBR/test/%s.mp4'
+    savename = '%s.mp4'
 
-    create_mp4(path, savename, seq='all')
+    create_mp4(path, savename, seq='042')
