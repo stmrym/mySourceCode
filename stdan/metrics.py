@@ -57,6 +57,7 @@ class SSIM:
         ssim = compare_ssim(img2, img1, **vars(self))
         return ssim
 
+
 class LPIPS:
     def __init__(self, val_range=255.0):
         self.device = 'cuda' if torch.cuda.device_count() > 0 else 'cpu'
@@ -77,6 +78,15 @@ class LPIPS:
                 print('unsupported format')
                 exit()
         return img
+
+
+class BRISQUE(CalcBRISQUE):
+    def __init__(self):
+        super(BRISQUE, self).__init__()
+
+    def calculate(self, img1, **kwargs):
+        return self.get_score(img1)
+
 
 class NIQE:
     def __init__(self, crop_border, input_order='HWC', convert_to='y', **kwargs):
@@ -569,9 +579,5 @@ def niqe(img, mu_pris_param, cov_pris_param, gaussian_window, block_size_h=96, b
     return quality
 
 
-class BRISQUE(CalcBRISQUE):
-    def __init__(self):
-        super(BRISQUE, self).__init__()
-
-    def calculate(self, img1, **kwargs):
-        return self.get_score(img1)
+if __name__ == '__main__':
+    print('metrics')

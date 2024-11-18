@@ -1,10 +1,4 @@
 # for blur only transform 
-UnsharpMasking:
-  kernel_size: 51
-  sigma: 0
-  weight: 0.5
-  threshold: 10
-
 RandomBlur:
   params:
     kernel_size: [7, 9, 11, 13, 15, 17, 19, 21]
@@ -34,9 +28,15 @@ RandomNoise:
     gaussian_sigma_step: 0.1
     poisson_scale_step: 0.005
 
+UnsharpMasking:
+  kernel_size: 51
+  sigma: 0
+  weight: 0.5
+  threshold: 10
+
 RandomJPEGCompression:
   params:
-    quality: [30, 95]
+    quality: [60, 95]
     quality_step: 3
 
 RandomVideoCompression:
