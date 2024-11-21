@@ -5,3 +5,5 @@ run_code.sh
 run.sh
 __pycache__
 runs/
+*.m
+source_code_m/inc/BM3D

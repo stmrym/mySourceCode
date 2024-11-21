@@ -7,6 +7,10 @@ import cv2
 import matplotlib.pyplot as plt
 
 
+
+
+
+
 def extract_patches(image, patch_size, overlap_fraction):
     h, w, c = image.shape
     step = int(patch_size[0] * overlap_fraction)
@@ -55,7 +59,7 @@ if __name__ == '__main__':
     image = cv2.imread('deblurred.png')
     patch_size = (256, 256)
     print(image.shape)
-    overlap_fraction = 7 / 8  # オーバーラップ量 (1/8)
+    overlap_fraction = 7 / 8  # オーバーラップ量
 
     patches = extract_patches(image, patch_size, overlap_fraction)
 

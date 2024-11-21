@@ -4,4 +4,6 @@
     # SSIM:
     # NIQE:
     #   crop_border: 0
-    BRISQUE:
+    # BRISQUE:
+    NIQE:
+    
