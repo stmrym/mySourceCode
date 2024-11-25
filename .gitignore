@@ -1,6 +1,8 @@
 *.png
 *.csv
 *.html
+*.mp4
+*.gif
 run_code.sh
 run.sh
 __pycache__
