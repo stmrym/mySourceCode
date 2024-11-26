@@ -23,7 +23,8 @@ def build_transforms(yaml_opt):
 
 if __name__ == '__main__':
     
-    base_tmpl = '/mnt/d/dataset/BSD_2ms16ms/test'
+    # base_tmpl = '/mnt/d/dataset/BSD_2ms16ms/test'
+    base_tmpl = '../dataset/BSD_2ms16ms_original/test'
     file_tmpl = 'Blur/RGB'
     dst_dir = '../dataset/BSD_2ms16ms_comp2/test/blur'
 

@@ -3,6 +3,7 @@
 *.html
 *.mp4
 *.gif
+*.npy
 run_code.sh
 run.sh
 __pycache__

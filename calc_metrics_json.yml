@@ -1,9 +1,8 @@
-    # PSNR:
-    #   crop_border: 0
-    #   max_order: 255.0
-    # SSIM:
-    # NIQE:
-    #   crop_border: 0
-    # BRISQUE:
+    PSNR:
+      crop_border: 0
+      max_order: 255.0
+    SSIM:
     NIQE:
+      crop_border: 0
+    # BRISQUE:
     

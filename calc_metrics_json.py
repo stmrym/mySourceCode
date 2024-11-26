@@ -1,20 +1,21 @@
-import cv2
-import json
-import os
-import sys
-import yaml
-import numpy as np
-from pathlib import Path
-from tqdm import tqdm
 from collections import OrderedDict
+import cv2
+import importlib
+import json
+import numpy as np
+import os
+from pathlib import Path
+import sys
+from tqdm import tqdm
+import yaml
 # import warnings
 
 # warnings.filterwarnings('error', category=RuntimeWarning)
 
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(parent_dir)
+# parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+# sys.path.append(parent_dir)
 
-from stdan import metrics
+# from stdan import metrics
 
 def check_save_path(save_name):
     if not isinstance(save_name, Path):
@@ -26,8 +27,12 @@ def check_save_path(save_name):
 def build_metrics(yaml_opt):
     metric_dict = OrderedDict()
     for name, params in yaml_opt.items():
-        metric = getattr(metrics, name)
+        
+        module = importlib.import_module(f'metrics.{name}')
+        metric = getattr(module, name)
         metric_dict[name] = metric(**params) if params is not None else metric()
+
+
     print(metric_dict)
     return metric_dict
 
@@ -37,6 +42,7 @@ def get_seq_path(img_base_path, specific_seq=''):
     else:
         img_seq_path_l = [Path(img_base_path) / specific_seq]
     return img_seq_path_l
+
 
 if __name__ == '__main__':
     
@@ -56,7 +62,7 @@ if __name__ == '__main__':
 
     img1_base_path = '../STDAN_modified/exp_log/test/2024-11-12T080924__/epoch-0400_Mi11Lite_output/'
     img2_base_path = '../dataset/Mi11Lite/test'
-    save_name = '../STDAN_modified/exp_log/test/2024-11-12T080924__/epoch-0400_Mi11Lite_output_debug.json'
+    save_name = 'debug.json'
 
     # for train output
     # img1_base_path = '../STDAN_modified/exp_log/train/2024-11-12T120452_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/epoch-0400_BSD_2ms16ms_output/'
@@ -92,7 +98,6 @@ if __name__ == '__main__':
             # calc_metrics
             for name, metric in metric_dict.items():
                 result = metric.calculate(img1=img1, img2=img2)
-                print(str(img1_path), result)
                 results_dict.setdefault(name, {}).setdefault(seq, {})[img1_path.name] = result
 
         # Average for each seq

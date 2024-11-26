@@ -1,97 +1,13 @@
+
 import cv2
-import numpy as np
 import math
+import numpy as np
 import os
-import lpips
-from skimage.metrics import structural_similarity as compare_ssim
-from brisque import BRISQUE as CalcBRISQUE
 from scipy.ndimage import convolve
 from scipy.special import gamma
 import torch
-import sys
+from utils.stop_watch import stop_watch
 
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(parent_dir)
-
-from stop_watch import stop_watch
-
-class PSNR:
-    def __init__(self, crop_border=0, max_order=255.0):
-        self.crop_border = crop_border
-        self.max_order = max_order
-
-    def calculate(self, img1, img2, **kwargs):
-        """Calculate PSNR (Peak Signal-to-Noise Ratio).
-
-        Reference: https://en.wikipedia.org/wiki/Peak_signal-to-noise_ratio
-
-        Args:
-            img (ndarray): Images with range [0, 255].
-            img2 (ndarray): Images with range [0, 255].
-            crop_border (int): Cropped pixels in each edge of an image. These pixels are not involved in the calculation.
-            input_order (str): Whether the input order is 'HWC' or 'CHW'. Default: 'HWC'.
-            test_y_channel (bool): Test on Y channel of YCbCr. Default: False.
-
-        Returns:
-            float: PSNR result.
-        """
-
-        assert img1.shape == img2.shape, (f'Image shapes are different: {img1.shape}, {img2.shape}.')
-
-        if self.crop_border != 0:
-            img1 = img1[self.crop_border:-self.crop_border, self.crop_border:-self.crop_border, ...]
-            img2 = img2[self.crop_border:-self.crop_border, self.crop_border:-self.crop_border, ...]
-
-        img1 = img1.astype(np.float64)
-        img2 = img2.astype(np.float64)
-
-        mse = np.mean((img1 - img2)**2)
-        if mse == 0:
-            return float('inf')
-        return 10. * np.log10(self.max_order * self.max_order / mse)
-
-
-class SSIM:
-    def __init__(self, data_range=255.0, channel_axis=2, gaussian_weights=True, sigma=1.5, use_sample_covariance=False):
-        self.data_range = data_range
-        self.channel_axis = channel_axis
-        self.gaussian_weights = gaussian_weights
-        self.sigma = sigma
-        self.use_sample_covariance = use_sample_covariance
-
-    def calculate(self, img1, img2, **kwargs):
-        ssim = compare_ssim(img2, img1, **vars(self))
-        return ssim
-
-
-class LPIPS:
-    def __init__(self, val_range=255.0):
-        self.device = 'cuda' if torch.cuda.device_count() > 0 else 'cpu'
-        self.loss_fn_alex = lpips.LPIPS(net='alex').to(self.device)
-        self.val_range = val_range
-
-    def calculate(self, img1, img2, **kwargs):
-        img1 = self._convert_to_tensor(img1, self.val_range) 
-        img2 = self._convert_to_tensor(img2, self.val_range) 
-        loss = self.loss_fn_alex(img1.permute(2,0,1).unsqueeze(0), img2.permute(2,0,1).unsqueeze(0)).mean().detach().cpu()
-        return loss
-
-    def _convert_to_tensor(self, img, val_range):
-        if not isinstance(img, torch.Tensor):
-            if isinstance(img, np.ndarray):
-                img = torch.from_numpy(img.astype(np.float32) / val_range).to(self.device)
-            else:
-                print('unsupported format')
-                exit()
-        return img
-
-
-class BRISQUE(CalcBRISQUE):
-    def __init__(self):
-        super(BRISQUE, self).__init__()
-
-    def calculate(self, img1, **kwargs):
-        return self.get_score(img1)
 
 
 class NIQE:
@@ -586,3 +502,13 @@ def niqe(img, mu_pris_param, cov_pris_param, gaussian_window, block_size_h=96, b
     return quality
 
 
+if __name__ == '__main__':
+    params = {'crop_border': 0}
+
+    deblurred = cv2.imread('./source_code_m/deblurred.png')
+
+    metric = NIQE(**params)
+
+    result = metric.calculate(img1=deblurred)
+
+    print(f'NIQE: {result:.3f}')
