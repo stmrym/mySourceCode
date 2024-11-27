@@ -28,6 +28,7 @@ class LR:
         print(score, features)
         return score
     
+    @stop_watch
     def _measure(self, deblurred, blurred):
 
         features = {}
@@ -43,7 +44,6 @@ class LR:
         # denoised = deblurred
         cv2.imwrite('denoised_cuda.png', np.clip(denoised*255, 0, 255).astype(np.uint8))
         np.save('denoised_cuda.npy', denoised)
-        exit()
         # denoised = np.load('denoised.npy')
 
         features['auto_corr'] = self._auto_corr(denoised)
@@ -201,5 +201,3 @@ if __name__ == '__main__':
     metric = LR(**params)
 
     result = metric.calculate(img1=deblurred, img2=blurred)
-
-    print(f'LR: {result:.3f}')

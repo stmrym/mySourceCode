@@ -1,7 +1,7 @@
 import cv2
 import torch
 import numpy as np
-from bm3d import bm3d_rgb
+from bm3d import bm3d
 from utils.stop_watch import stop_watch
 
 @stop_watch
@@ -31,9 +31,7 @@ def denoise(img):
     cur_high = HIGH
     while cont:
         cur = (cur_low + cur_high) * 0.5
-        print(f'cont:{cont}, cur:{cur} start_bm3d_twocolor')
         denoised, err = bm3d_twocolor(img, cur)
-        print(err)
         result.append([cur, err])
 
         if err <= THRESHOLD:
@@ -41,6 +39,7 @@ def denoise(img):
         else:
             cur_low = cur
 
+        print(cur_low, MIN_STEP, cur_high)
         if (cur_low + MIN_STEP >= cur_high):
             idx = np.abs(np.array(result)[:, 0] - cur_high).argmin()
             assert idx is not None
@@ -55,14 +54,9 @@ def denoise(img):
 @stop_watch
 def bm3d_twocolor(img, noise_level):
     if noise_level > 1e-6:
-        print(f'True {noise_level}')
-        denoised = bm3d_rgb(img, sigma_psd=noise_level * 255).astype(np.float32)
-        print('end denoise')
+        denoised = bm3d(img, sigma_psd=noise_level * 255).astype(np.float32)
     else:
-        print(f'False {noise_level}')
         denoised = img
-
-    print('begin twocolor')
     
     _, _, err = two_color(denoised)
     err = (np.mean(err**0.8))**(1 / 0.8)
@@ -101,7 +95,6 @@ def im2col(A, block_size, stepsize=1):
 
 
 
-@stop_watch
 def init_centers(r_col, g_col, b_col, patch_size):
     idx = np.random.randint(0, patch_size[0]*patch_size[1], size=(1, r_col.shape[1]))
 
@@ -111,6 +104,7 @@ def init_centers(r_col, g_col, b_col, patch_size):
 
         
     c_idx = np.ravel_multi_index((np.arange(len(idx[0])), idx[0]), r_col.T.shape)
+
 
     rc[0] = r_col.ravel('F')[c_idx]
     gc[0] = g_col.ravel('F')[c_idx]
@@ -135,7 +129,6 @@ def init_centers(r_col, g_col, b_col, patch_size):
 
 
 
-@stop_watch
 def two_color(img):
     assert img.shape[2] == 3
     
@@ -210,6 +203,6 @@ def two_color(img):
     proj = np.sum(diff * dir, axis=2)
     dist = diff - dir * proj[..., np.newaxis]
     err = np.sqrt(np.sum(dist**2, axis=2))
-    
+
     return center1, center2, err
 

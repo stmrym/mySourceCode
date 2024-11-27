@@ -37,11 +37,9 @@ class LR_Cuda:
         features['smallgrad'] = self._smallgrad(deblurred)
         features['metric_q'] = self._metric_q(deblurred)
 
-        print('before')
         denoise = Denoise()
         denoised = denoise.denoise(deblurred)
-        print('after')
-
+        
         # denoised = deblurred
         cv2.imwrite('denoised.png', np.clip(denoised*255, 0, 255).astype(np.uint8))
         # np.save('denoised.npy', denoised)

@@ -65,22 +65,37 @@ if __name__ == '__main__':
     # dataset = 'BSD_2ms16ms_comp'
     dataset = 'Mi11Lite'
     # seq = '121'
-    seq = 'VID_20240523_165150'
+    seq = 'VID_20240523_163120'
     # frame = '00000006.png'
-    frame = '00041.png'
+    frame = '00035.png'
     # exp = '2024-11-21T192622_C_ESTDAN_v3_BSD_3ms24ms_GOPRO'
-    exp = '2024-11-18T170527_CT_ESTDAN_v3_BSD_3ms24ms_GOPRO'
+    # exp = '2024-11-18T170527_CT_ESTDAN_v3_BSD_3ms24ms_GOPRO'
+    exp = '2024-11-25T193451__F_ESTDAN_v3_'
 
     input_path = Path('../dataset') / dataset / 'test' / seq / frame
-    video_base_path = Path('../STDAN_modified/exp_log/train/') / exp / 'visualization'
-    pattern = Path('epoch-*_'+ dataset + '_input') / seq / frame
+    video_base_path = Path('../STDAN_modified/exp_log/test/') / exp / 'visualization'
+    pattern = Path('epoch-*_'+ dataset + '_output') / seq / frame
 
     output_dir = ''
 
 
     path_l, seq_l = search_path_list(video_base_path, pattern)
+    
+    del_index_l = []
+    for i in range(len(path_l)):
+        epoch = seq_l[i].split('epoch-')[-1].split('_')[0]
+        if int(epoch) % 100 != 0:
+            del_index_l.append(i)
+    
+    del_index_l.sort(reverse=True)
+    for index in del_index_l:
+        del path_l[index], seq_l[index]
+
     path_l.insert(0, input_path)
     seq_l.insert(0, 'Input')
+
+    for path, seq in zip(path_l, seq_l):
+        print(path, seq)
 
     save_name = Path(output_dir) / '-'.join(Path(str(pattern).replace('epoch-*_', '')).with_suffix('').parts + (video_base_path.parts[-2], ) )
 
