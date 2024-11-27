@@ -71,7 +71,7 @@ class Denoise:
         if noise_level > 1e-6:
             print(f'True {noise_level}')
             # denoised = bm3d_rgb(img, sigma_psd=noise_level * 255).astype(np.float32)
-            denoised = self.bm3d((img*255).int(),)
+            denoised = self.bm3d((img*255).int(),variants=0)
 
             print('end denoise')
         else:
