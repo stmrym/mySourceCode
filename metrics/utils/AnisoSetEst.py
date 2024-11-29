@@ -1,6 +1,12 @@
 import numpy as np
+import torch
+import torch.nn.functional as F
+from utils import util
+from utils.stop_watch import stop_watch
 
+@stop_watch
 def SVDCoherence(gmap):
+
     gx = np.real(gmap)
     gy = np.imag(gmap)
 
@@ -8,7 +14,7 @@ def SVDCoherence(gmap):
     gyvect = gy.ravel('F')
 
     grad = np.vstack((gxvect, gyvect)).T
-
+    
     U, S, Vt = np.linalg.svd(grad, full_matrices=False)
 
     s1 = float(S[0])
@@ -33,23 +39,24 @@ def AnisoSetEst(img, N):
     thresh = alph**(1 / (N**2 - 1))
     thresh = np.sqrt((1 - thresh) / (1 + thresh))
 
+
     for m in range(h):
         for n in range(w):
             AOI = img[N * m:N * (m + 1), N * n:N * (n + 1)]
             
             gx, gy = np.gradient(AOI)
             G = gx + 1j * gy
-
             co, _ = SVDCoherence(G)
-            
+
             if co > thresh:
                 mp[m, n] = 1
-    
+
     return mp
 
 
-def MetricQ(img, N, map):
 
+
+def MetricQ(img, N, map):
     H, W = img.shape
     w = W//N
     h = H//N
@@ -68,3 +75,5 @@ def MetricQ(img, N, map):
 
     Q /= (w * h)
     return Q
+
+

@@ -33,10 +33,12 @@ class LR:
 
         features = {}
 
-        features['sparsity'] = self._sparsity(deblurred)
-        features['smallgrad'] = self._smallgrad(deblurred)
+        # features['sparsity'] = self._sparsity(deblurred)
+        # features['smallgrad'] = self._smallgrad(deblurred)
         features['metric_q'] = self._metric_q(deblurred)
  
+        print(features)
+        exit()
         denoised = denoise(deblurred)
 
         print('finish denoise_cuda')
