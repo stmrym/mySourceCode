@@ -14,11 +14,21 @@ def compute_ncc(img, ref, img_margin):
     ncc_abs = np.ones((img_margin * 2 + 1, img_margin * 2 + 1))
 
     img_mask = mask_lines(img)
-    ref_mask = mask_lines(ref)
+    # ref_mask = mask_lines(ref)
+    ref_mask = img_mask.copy()
+
+
+    # print(img_mask)
+    # print(img_mask.shape)
+    # print(img_mask.max(), img_mask.min())
+    # img_mask_np = np.clip(img_mask.astype(np.float32)*255, 0, 255).astype(np.uint8)
+    # cv2.imwrite('edge_mask_cpu.png', img_mask_np)
+    # exit()
+
     t_mask = ref_mask[img_margin:-img_margin, img_margin:-img_margin]
 
-    dx, dy = np.gradient(img, axis=(0, 1)) 
-    tdx, tdy = np.gradient(template, axis=(0, 1))
+    dx, dy = np.gradient(img) 
+    tdx, tdy = np.gradient(template)
 
     dx[img_mask] = 0 
     dy[img_mask] = 0 
@@ -27,6 +37,7 @@ def compute_ncc(img, ref, img_margin):
 
     ncc_dx = xcorr2_fft(tdx, dx)
     ncc_dy = xcorr2_fft(tdy, dy)
+
 
     ncc_dx = ncc_dx[tdx.shape[0]-1:, tdx.shape[1]-1:]
     ncc_dy = ncc_dy[tdy.shape[0]-1:, tdy.shape[1]-1:]
@@ -41,6 +52,7 @@ def compute_ncc(img, ref, img_margin):
     ncc_dy_abs = np.abs(ncc_dy)
 
     mask = ncc_dx_abs < ncc_abs
+
     ncc[mask] = ncc_dx[mask]
     ncc_abs[mask] = ncc_dx_abs[mask]
 
@@ -62,6 +74,7 @@ def mask_lines(img):
     filter = np.ones((3, 3))
     for _ in range(20):
         cur_mask = mask_line(e)
+    
         e[cur_mask] = False
 
         cur_mask = convolve(cur_mask, filter, mode='constant', cval=0.0)
@@ -83,7 +96,6 @@ def mask_line(e):
     for line in lines:
         if line is None:
             continue
-
         xy = np.array([line[0], line[1]])
 
         xs = np.linspace(xy[0, 0], xy[1, 0], len_max) 
@@ -98,8 +110,13 @@ def mask_line(e):
 
 
 def mask_points(mask, xs, ys):
-    indices = np.ravel_multi_index((xs, ys), mask.T.shape, mode='clip') # マスクを更新 
-    mask.ravel('F')[indices] = True
+
+    indices = np.ravel_multi_index((xs, ys), mask.T.shape) # マスクを更新 
+    # mask.ravel('F')[indices] = True
+    
+    for x, y in zip(xs, ys):
+        mask[y,x] = True
+    
     return mask
 
 

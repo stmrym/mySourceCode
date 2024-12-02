@@ -5,9 +5,13 @@ from skimage.transform import resize
 import torch
 import torch.nn.functional as F
 from utils_cuda import util
+from utils import util as util_cpu
+
 from utils_cuda import AnisoSetEst 
 from utils_cuda.denoise_cuda import Denoise
-from utils.compute_ncc import compute_ncc
+from utils_cuda.compute_ncc import compute_ncc
+from utils.compute_ncc import compute_ncc as compute_ncc_cpu
+
 from utils.pyr_ring import align, grad_ring
 from utils.stop_watch import stop_watch
 
@@ -44,7 +48,7 @@ class LR_Cuda:
         gray_tensor = torch.tensordot(img_tensor, weights, dims=([-3], [0]))
         return gray_tensor
 
-
+    # @stop_watch
     def calculate(self, img1, img2, **kwargs):
         '''
         img1: deblurred image: ndarray (BGR) [0, 255] with shape (H, W, C)
@@ -54,7 +58,7 @@ class LR_Cuda:
         img2_tensor = self._img2tensor((img2/255).astype(np.float32))
 
         score, features = self._measure(deblurred=img1_tensor, blurred=img2_tensor)
-        print(score, features)
+        # print(score, features)
         return score
     
 
@@ -69,18 +73,25 @@ class LR_Cuda:
         features['smallgrad'] = self._smallgrad(deblurred)
         features['metric_q'] = self._metric_q(deblurred)
 
-        denoise = Denoise(self.device)
-        denoised = denoise.denoise(deblurred)
+        # denoise = Denoise(self.device)
+        # denoised = denoise.denoise(deblurred)
+        denoised = deblurred
 
-        print(denoised.shape)
-
-        denoised_np = self._tensor2img(denoised)
-        cv2.imwrite('denoised.png', np.clip(denoised_np*255, 0, 255).astype(np.uint8))
-        # print(denoised)
-        # print(deblurred)
-        exit()        
+        # denoised_np = self._tensor2img(denoised)
+        # cv2.imwrite('denoised.png', np.clip(denoised_np*255, 0, 255).astype(np.uint8))
+        
         features['auto_corr'] = self._auto_corr(denoised)
+
+        # print(denoised.shape)
+        # features['auto_corr'] = self._auto_corr_cpu(denoised)
+
         features['norm_sps'] = self._norm_sparsity(denoised)
+
+        denoised = self._tensor2img(denoised)
+        blurred = self._tensor2img(blurred)
+        deblurred = self._tensor2img(deblurred)
+
+
         features['cpbd'] = self._calc_cpbd(denoised)
         features['pyr_ring'] = self._pyr_ring(denoised, blurred)
         features['saturation'] = self._saturation(deblurred)
@@ -96,7 +107,8 @@ class LR_Cuda:
 
         return score, features
     
-    @stop_watch
+
+    # @stop_watch
     def _sparsity(self, img):
         '''
         img: torch.Tensor (RGB) with shape (B, C, H, W)
@@ -109,7 +121,7 @@ class LR_Cuda:
         return result.cpu().item()
 
 
-    @stop_watch
+    # @stop_watch
     def _smallgrad(self, img):
         '''
         img: torch.Tensor (RGB) with shape (B, C, H, W)
@@ -128,7 +140,7 @@ class LR_Cuda:
         return result.cpu().item()
     
 
-    @stop_watch
+    # @stop_watch
     def _metric_q(self, img):
         '''
         img: torch.Tensor (RGB) with shape (B, C, H, W)
@@ -138,13 +150,60 @@ class LR_Cuda:
         result = -AnisoSetEst.MetricQ_cuda(img, PATCH_SIZE)
         return result.cpu().item()
     
-    @stop_watch
+
+    # @stop_watch
     def _auto_corr(self, img):
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        '''
+        img: torch.Tensor (RGB) with shape (B, C, H, W)
+        '''
+        img = self._tensor_rgb2gray(img)
 
         MARGIN = 50
 
         ncc_orig = compute_ncc(img, img, MARGIN)
+
+        sizes = ncc_orig.size()
+        assert sizes[0] == sizes[1]
+        assert sizes[0] % 2 == 1
+
+        # 半径を計算
+        radius = sizes[0] // 2
+
+        # 距離行列を計算
+        y_dists, x_dists = torch.meshgrid(torch.arange(sizes[0], device=img.device), torch.arange(sizes[1], device=img.device))
+        dists = torch.sqrt((y_dists - radius).float() ** 2 + (x_dists - radius).float() ** 2)
+
+        # ncc の絶対値を取得
+        ncc = torch.abs(ncc_orig)
+
+        # max_m の初期化
+        max_m = torch.zeros(1 + radius, device=img.device)
+
+        # 各半径に対して計算
+        for r in range(0, radius + 1):
+            w = torch.abs(dists - r)
+            w = torch.min(w, torch.tensor(1.0, device=img.device))
+            w = 1 - w
+            max_m[r] = torch.max(ncc[w > 0])
+
+        # max_m の最初の要素を 0 に設定
+        max_m[0] = 0
+
+        # 結果を計算
+        result = torch.sum(max_m)
+
+        return result.cpu().item()
+
+
+
+    # @stop_watch
+    def _auto_corr_cpu(self, img):
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        MARGIN = 50
+
+        ncc_orig = compute_ncc_cpu(img, img, MARGIN)
+
 
         sizes = ncc_orig.shape 
         assert sizes[0] == sizes[1] 
@@ -165,23 +224,40 @@ class LR_Cuda:
 
         return result
 
-    @stop_watch
+
+    # @stop_watch
     def _norm_sparsity(self, img):
+        '''
+        img: torch.Tensor (RGB) with shape (B, C, H, W)
+        '''
+        img = self._tensor_rgb2gray(img)
+
+
+        dx, dy = util.gradient_cuda(img)
+        d = torch.sqrt(dx**2 + dy**2)
+        
+        result = util.mean_norm_cuda(d, 1.0) / util.mean_norm_cuda(d, 2.0)
+        return result.cpu().item()        
+        
+
+
+    # @stop_watch
+    def _norm_sparsity_cpu(self, img):
 
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         dx, dy = np.gradient(img)
         d = np.sqrt(dx**2 + dy**2)
 
-        result = util.mean_norm(d, 1.0) / util.mean_norm(d, 2.0)
+        result = util_cpu.mean_norm(d, 1.0) / util_cpu.mean_norm(d, 2.0)
         return result
 
-    @stop_watch
+    # @stop_watch
     def _calc_cpbd(self, img):
         img = np.clip(img * 255, 0, 255).astype(np.uint8)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         return -cpbd.compute(img)
 
-    @stop_watch
+    # @stop_watch
     def _pyr_ring(self, img, blurred):
 
         img, blurred = align(img, blurred, True)
@@ -209,7 +285,7 @@ class LR_Cuda:
 
         return result
 
-    @stop_watch
+    # @stop_watch
     def _saturation(self, img):
         # 各ピクセルの最大値を計算
         max_values = np.max(img, axis=2)

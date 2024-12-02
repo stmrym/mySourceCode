@@ -1,8 +1,5 @@
-import cv2
 import torch
 from torch import nn
-import numpy as np
-from bm3d import bm3d_rgb
 from pytorch_bm3d import BM3D
 from utils.stop_watch import stop_watch
 
@@ -21,7 +18,7 @@ class Denoise:
         self.unfold = nn.Unfold(kernel_size=self.patch_size)
         self.bm3d = BM3D(two_step=True)
 
-    @stop_watch
+    # @stop_watch
     def denoise(self, img):
         '''
         img: torch.tensor (RGB) [0, 1] with shape (C, H, W)
