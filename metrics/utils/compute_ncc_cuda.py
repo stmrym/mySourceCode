@@ -4,12 +4,16 @@ import numpy as np
 import torch
 import torch.fft
 import torch.nn.functional as F
-from utils.stop_watch import stop_watch
-from utils_cuda import util
 from skimage.transform import probabilistic_hough_line
 from scipy.signal import fftconvolve
+import sys
+import os
+sys.path.append(os.path.dirname(__file__))
 
-def compute_ncc(img, ref, margin):
+from util import gradient_cuda
+from stop_watch import stop_watch
+
+def compute_ncc_cuda(img, ref, margin):
     '''
     img: torch.Tensor (Gray) with shape (B, H, W)
     ref: torch.Tensor (Gray) with shape (B, H, W)
@@ -20,7 +24,7 @@ def compute_ncc(img, ref, margin):
     ncc = torch.ones(1, margin*2 + 1, margin*2 + 1, device=img.device) * 100
     ncc_abs = torch.ones(1, margin*2 + 1, margin*2 + 1, device=img.device) * 100
 
-    img_mask = mask_lines(img)
+    img_mask = mask_lines_cuda(img)
     # ref_mask = mask_lines(ref)
     ref_mask = img_mask.clone()
 
@@ -29,8 +33,8 @@ def compute_ncc(img, ref, margin):
 
     t_mask = ref_mask[:, margin:-margin, margin:-margin]
 
-    dx, dy = util.gradient_cuda(img)
-    tdx, tdy = util.gradient_cuda(template)
+    dy, dx = gradient_cuda(img)
+    tdy, tdx = gradient_cuda(template)
 
     # exclude edges from gradient
     dx[img_mask] = 0
@@ -76,7 +80,7 @@ def compute_ncc(img, ref, margin):
 
 
 # @stop_watch
-def mask_lines(img):
+def mask_lines_cuda(img):
     '''
     img: torch.Tensor (Gray) with shape (B, H, W)
     
@@ -94,7 +98,7 @@ def mask_lines(img):
     filter = torch.ones((1,1,3,3), device=img.device)
 
     for _ in range(20):
-        cur_mask = mask_line(e)
+        cur_mask = mask_line_cuda(e)
         e[cur_mask] = False
         
         #  (1,H,W) -> (1,1,H,W)
@@ -106,7 +110,7 @@ def mask_lines(img):
     return mask
 
 
-def mask_line(e):
+def mask_line_cuda(e):
     '''
     e: canny edge torch.Tensor with shape (1, H, W)
     
@@ -124,7 +128,7 @@ def mask_line(e):
         p1, p2 = line
         cv2.line(mask, p1, p2, 1, 1)
     
-    mask = mask.astype(np.bool)
+    mask = mask.astype(np.bool_)
     return _ndarray2tensor(mask, e.device).unsqueeze(0)
 
 

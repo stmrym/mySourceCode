@@ -1,8 +1,11 @@
-import numpy as np
 import torch
-import torch.nn.functional as F
-from utils_cuda import util
-from utils.stop_watch import stop_watch
+import sys
+import os
+
+sys.path.append(os.path.dirname(__file__))
+
+from util import gradient_cuda
+from stop_watch import stop_watch
 
 
 def SVDCoherence_cuda(gmap):
@@ -44,7 +47,7 @@ def AnisoSetEst_cuda(img, N):
 
     # (B, H, W) -> (B, h, w, N, N) -> (B*num_patches, N, N)
     patches = img.unfold(1,N,N).unfold(2,N,N).reshape(-1,N,N)
-    gx, gy = util.gradient_cuda(patches)
+    gx, gy = gradient_cuda(patches)
     G = gx + 1j*gy
 
     co, s1 = SVDCoherence_cuda(G)
@@ -67,7 +70,7 @@ def MetricQ_cuda(img, N):
     # (B, H, W) -> (B, h, w, N, N) -> (B*num_patches, N, N)
     patches = img.unfold(1,N,N).unfold(2,N,N).reshape(-1,N,N)
 
-    gx, gy = util.gradient_cuda(patches)
+    gx, gy = gradient_cuda(patches)
     G = gx + 1j*gy
 
     co, s1 = SVDCoherence_cuda(G)

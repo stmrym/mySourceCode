@@ -1,14 +1,13 @@
 import numpy as np
-import torch
-import torch.nn.functional as F
-from utils import util
-from utils.stop_watch import stop_watch
+import sys
+import os
 
-@stop_watch
-def SVDCoherence(gmap):
+sys.path.append(os.path.dirname(__file__))
 
-    gx = np.real(gmap)
-    gy = np.imag(gmap)
+from stop_watch import stop_watch
+
+# @stop_watch
+def SVDCoherence(gx, gy):
 
     gxvect = gx.ravel('F')
     gyvect = gy.ravel('F')
@@ -28,52 +27,36 @@ def SVDCoherence(gmap):
     return co, np.abs(s1)
 
 
-def AnisoSetEst(img, N):
+def MetricQ(img, N):
     H, W = img.shape
 
     w = W // N
     h = H // N
 
-    mp = np.zeros((h, w))
+    # mp = np.zeros((h, w))
     alph = 0.001
     thresh = alph**(1 / (N**2 - 1))
     thresh = np.sqrt((1 - thresh) / (1 + thresh))
 
+    Q = 0
 
     for m in range(h):
         for n in range(w):
             AOI = img[N * m:N * (m + 1), N * n:N * (n + 1)]
             
-            gx, gy = np.gradient(AOI)
-            G = gx + 1j * gy
-            co, _ = SVDCoherence(G)
+            # gx, gy = np.gradient(AOI)
+            gy, gx = np.gradient(AOI)
+
+            # G = gx + 1j * gy
+            co, s1 = SVDCoherence(gx, gy)
 
             if co > thresh:
-                mp[m, n] = 1
+                # mp[m, n] = 1
+                Q += co * s1
 
-    return mp
-
-
-
-
-def MetricQ(img, N, map):
-    H, W = img.shape
-    w = W//N
-    h = H//N
-    Q = 0
-
-    for m in range(h):
-        for n in range(w):
-            if map[m, n] == 0:
-                continue
-            AOI = img[N * m:N * (m + 1), N * n:N * (n + 1)]
-            gx, gy = np.gradient(AOI)
-
-            G = gx + 1j * gy 
-            co, s1 = SVDCoherence(G) 
-            Q += co * s1
-
-    Q /= (w * h)
+    Q /= (w*h)
     return Q
+
+
 
 
