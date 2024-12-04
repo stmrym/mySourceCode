@@ -6,7 +6,7 @@ import os
 from scipy.ndimage import convolve
 from scipy.special import gamma
 import torch
-from utils.stop_watch import stop_watch
+# from utils.stop_watch import stop_watch
 
 
 
@@ -16,7 +16,7 @@ class NIQE:
         self.input_order = input_order
         self.convert_to = convert_to
 
-    @stop_watch
+    # @stop_watch
     def calculate(self, img1, **kwargs):
         """Calculate NIQE (Natural Image Quality Evaluator) metric.
 

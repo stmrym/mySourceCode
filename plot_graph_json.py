@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from tqdm import tqdm
 from matplotlib.ticker import MaxNLocator
+from matplotlib.ticker import MultipleLocator
 import yaml
 from pathlib import Path
 '''
@@ -36,8 +37,8 @@ class dataPlot():
         ax.plot(self.frame_l, self.value_l, **self.kwargs)
 
 
-seq = '103'
-metric = 'BRISQUE'  # PSNR, SSIM, BRISQUE
+seq = 'VID_20240523_163625'
+metric = 'NIQE'  # PSNR, SSIM, BRISQUE
 
 
 if __name__ == '__main__':
@@ -50,26 +51,31 @@ if __name__ == '__main__':
     # epoch-0400_BSD_1ms8ms_output.json
     # epoch-0400_BSD_1ms8ms_comp_output.json
     
-    save_name = seq + '_' + metric + '_comp_graph.png'
+    save_name = seq + '_' + metric + '_graph.png'
     font_size = 12
     dpi = 200
     print(seq, metric)
 
     plot_list = [
-        dataPlot(json_path = '../STDAN_modified/exp_log/test/2024-11-14T040540__STDAN_/epoch-0400_BSD_1ms8ms_comp_output.json',
-            ls='-', lw=1.0, c='black', label = 'STDAN',
+
+        dataPlot(json_path = 'stdan_result/E_epoch-0400.json',
+            ls='-', lw=1.0, c='black', label = 'ESTDAN epoch-0400',
         ),
 
-        dataPlot(json_path = '../STDAN_modified/exp_log/test/2024-11-12T080924__/epoch-0400_BSD_1ms8ms_comp_output.json',
-            ls='-', lw=1.0, c='tab:blue', label = 'ESTDAN',
+        dataPlot(json_path = 'stdan_result/VT1_epoch-0500.json',
+            ls='-', lw=1.0, c='tab:orange', label = '+VT1 epoch-0500',
         ),
 
-        dataPlot(json_path = '../STDAN_modified/exp_log/test/2024-11-12T073940__CT_/epoch-0400_BSD_1ms8ms_comp_output.json',
-            ls='-', lw=1.0, c='tab:red', label = 'R-ESTDAN',
+        dataPlot(json_path = 'stdan_result/VT2_epoch-0700.json',
+            ls='-', lw=1.0, c='magenta', label = '+VT2 epoch-0700',
         )
+
+        # dataPlot(json_path = 'stdan_result.json',
+        #     ls='-', lw=1.0, c='tab:red', label = 'R-ESTDAN',
+        # )
     ]
 
-  
+
     ### plot graph ###
     fig, ax = plt.subplots(figsize=(11,3))
 
@@ -78,7 +84,7 @@ if __name__ == '__main__':
     frame_min = plot_list[0].frame_l[0]
     frame_max = plot_list[0].frame_l[-1]
     ax.set_xlim([frame_min, frame_max])
-    ax.set_ylim([40, 90])
+    # ax.set_ylim([40, 90])
     ax.set_xlabel('frame', fontsize=font_size)
     ax.set_ylabel(metric, fontsize=font_size)
 
@@ -92,7 +98,12 @@ if __name__ == '__main__':
     ax.grid(which = "both", axis="x", alpha=0.5)
     ax.grid(axis='y')
     ax.legend() 
-    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+    # ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+    ax.xaxis.set_major_locator(MultipleLocator(5))
+    ax.xaxis.set_minor_locator(MultipleLocator(1))
+
+    # ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+
     plt.title(f'Seq.{seq}')
     plt.tight_layout()
     plt.savefig(save_name, transparent=False, dpi=dpi, bbox_inches='tight')

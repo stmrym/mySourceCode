@@ -19,6 +19,7 @@ from utils.compute_ncc_cuda import compute_ncc_cuda
 from utils.CPBD_compute import cpbd_compute
 
 from utils.pyr_ring import align, grad_ring
+from utils.pyr_ring_cuda import align_cuda
 from utils.stop_watch import stop_watch
 
 
@@ -69,13 +70,14 @@ class LR_Cuda:
         features['cpbd'] = self._calc_cpbd(denoised)
         # features['cpbd'] = self._calc_cpbd_cpu(denoised)
         
-        denoised = tensor2img(denoised)
-        blurred = tensor2img(blurred)
-        deblurred = tensor2img(deblurred)
 
         features['pyr_ring'] = self._pyr_ring(denoised, blurred)
         features['saturation'] = self._saturation(deblurred)
         
+        denoised = tensor2img(denoised)
+        blurred = tensor2img(blurred)
+        deblurred = tensor2img(deblurred)
+
         score = (features['sparsity']   * -8.70515   +
                 features['smallgrad']  * -62.23820  +
                 features['metric_q']   * -0.04109   +
@@ -246,6 +248,7 @@ class LR_Cuda:
         result = -cpbd_compute(img)
         return result
 
+
     @stop_watch
     def _calc_cpbd_cpu(self, img):
 
@@ -256,8 +259,19 @@ class LR_Cuda:
         return -cpbd.compute(img)
 
 
-    @stop_watch
     def _pyr_ring(self, img, blurred):
+        '''
+        img: torch.Tensor (RGB) with shape (B, C, H, W)
+        '''
+        device = img.device
+        img, blurred = align_cuda(img, blurred, True)
+
+
+
+
+
+    @stop_watch
+    def _pyr_ring_cpu(self, img, blurred):
 
         img, blurred = align(img, blurred, True)
         height, width, color_count = img.shape
@@ -314,8 +328,8 @@ if __name__ == '__main__':
 
     params = {'device': 'cuda:0'}
 
-    deblurred = cv2.imread('./source_code_m/deblurred.png')
-    blurred = cv2.imread('./source_code_m/blurry.png')
+    deblurred = cv2.imread('source_code_m/deblurred.png')
+    blurred = cv2.imread('source_code_m/blurry.png')
 
     metric = LR_Cuda(**params)
 

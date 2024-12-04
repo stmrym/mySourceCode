@@ -13,6 +13,7 @@ sys.path.append(os.path.dirname(__file__))
 from util import gradient_cuda
 from stop_watch import stop_watch
 
+
 def compute_ncc_cuda(img, ref, margin):
     '''
     img: torch.Tensor (Gray) with shape (B, H, W)
@@ -97,8 +98,16 @@ def mask_lines_cuda(img):
 
     filter = torch.ones((1,1,3,3), device=img.device)
 
+    e_np = _tensor2ndarray(e[0])
+
+    cur_mask_l = []
     for _ in range(20):
-        cur_mask = mask_line_cuda(e)
+        cur_mask = mask_line_cuda(e_np)
+        cur_mask_l.append(cur_mask)
+        
+    for cur_mask in cur_mask_l:
+
+        cur_mask = _ndarray2tensor(cur_mask, img.device).unsqueeze(0)
         e[cur_mask] = False
         
         #  (1,H,W) -> (1,1,H,W)
@@ -109,14 +118,14 @@ def mask_lines_cuda(img):
 
     return mask
 
-
-def mask_line_cuda(e):
+# @stop_watch
+def mask_line_cuda(e_np):
     '''
     e: canny edge torch.Tensor with shape (1, H, W)
     
     -> mask: torch.tensor lined_mask [0, 1] with shape (1, H, W)
     '''
-    e_np = _tensor2ndarray(e[0])
+    # e_np = _tensor2ndarray(e[0])
 
     # [((x1s, y1s), (x1e, y1e)), ((x2s, y2s), (x2e, 2ye)), ...]
     lines = probabilistic_hough_line(e_np, threshold=10, line_length=20, line_gap=8)
@@ -129,7 +138,7 @@ def mask_line_cuda(e):
         cv2.line(mask, p1, p2, 1, 1)
     
     mask = mask.astype(np.bool_)
-    return _ndarray2tensor(mask, e.device).unsqueeze(0)
+    return mask
 
 
 def _tensor2ndarray(tensor):
@@ -148,6 +157,7 @@ def _ndarray2tensor(ndarray, device):
     assert len(ndarray.shape) == 2, '_ndarray2tensor input must be (H, W)'
     tensor = torch.tensor(ndarray, device=device)
     return tensor
+
 
 
 def xcorr2_fft_cpu(a, b):

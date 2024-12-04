@@ -60,16 +60,17 @@ if __name__ == '__main__':
     # img2_base_path = '../dataset/BSD_1ms8ms/test/GT'
     # save_name = '../STDAN_modified/exp_log/test/2024-11-12T073940__CT_/epoch-0400_BSD_1ms8ms_output_brisque.json'
 
-    img1_base_path = '../STDAN_modified/exp_log/test/2024-11-12T080924__/epoch-0400_Mi11Lite_output/'
+    img1_base_path = '../STDAN_modified/exp_log/train/2024-11-30T062157_T_change_transform_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/epoch-0500_Mi11Lite_output/'
     img2_base_path = '../dataset/Mi11Lite/test'
-    save_name = 'debug.json'
+    save_name = 'E_epoch-0500.json'
 
     # for train output
     # img1_base_path = '../STDAN_modified/exp_log/train/2024-11-12T120452_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/epoch-0400_BSD_2ms16ms_output/'
     # img2_base_path = '../dataset/BSD_2ms16ms/test/GT'
     # save_name = '../STDAN_modified/exp_log/train/2024-11-12T120452_ESTDAN_v3_BSD_3ms24ms_GOPRO/epoch-0400_BSD_2ms16ms_output.json'
     
-    specific_seq = 'VID_20240523_165150'
+    # specific_seq = 'VID_20240523_165150'
+    specific_seq = ''
 
 
 

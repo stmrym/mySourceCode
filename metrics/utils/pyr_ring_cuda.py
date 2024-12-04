@@ -4,20 +4,16 @@ from scipy.ndimage import convolve, gaussian_filter
 from pymlfunc import normxcorr2
 
 
-def align(image, ref, return_images=False):
-    '''
-    img: torch.Tensor (RGB) [0,1] with shape (B, C, H, W)
-    ref: torch.Tensor (RGB) [0,1] with shape (B, C, H, W)
+def align_cuda(image, ref, return_images=False):
 
-        '''
     margin = 75
     
-    # テンプレートの抽出
-    template = image[margin:-margin, margin:-margin, :]
-    template_size = template.shape
-    template_size = np.array(template_size) + (np.mod(template_size, 2) - 1)
-    template_size = template_size[0:2]
-    template = template[:template_size[0], :template_size[1], :]
+    # extract template with odd size
+    template = image[..., margin:-margin, margin:-margin]
+    template_size = np.array(template.shape)
+    template_size = template_size + (template_size % 2) - 1
+    template_size = template_size[-2:]
+    template = template[...,:template_size[0], :template_size[1]]
 
     # NCCの計算
     ref_size = ref.shape

@@ -29,8 +29,13 @@ def tensor2img(img_tensor):
 
 def tensor_rgb2gray(img_tensor):
     '''
-    tensor (RGB) with shape (..., C, H, W) -> tensor (Gray) with shape (..., H, W)
+    tensor (RGB) with shape (B, C, H, W) -> tensor (Gray) with shape (..., H, W)
     '''
-    weights = torch.tensor([0.299, 0.5870, 0.1140], device=img_tensor.device)
-    gray_tensor = torch.tensordot(img_tensor, weights, dims=([-3], [0]))
+    weights = torch.tensor([0.299, 0.5870, 0.1140], device=img_tensor.device).reshape(3,1,1)
+
+    # weights = torch.tensor([0.299, 0.5870, 0.1140], device=img_tensor.device)
+
+    gray_tensor = (img_tensor * weights).sum(dim=-3)
+    # gray_tensor = torch.tensordot(img_tensor, weights, dims=([-3], [0]))
+
     return gray_tensor
