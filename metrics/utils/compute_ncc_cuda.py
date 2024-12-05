@@ -6,6 +6,7 @@ import torch.fft
 import torch.nn.functional as F
 from skimage.transform import probabilistic_hough_line
 from scipy.signal import fftconvolve
+from scipy import linalg, fft as sp_fft
 import sys
 import os
 sys.path.append(os.path.dirname(__file__))
@@ -80,7 +81,7 @@ def compute_ncc_cuda(img, ref, margin):
 
 
 
-# @stop_watch
+@stop_watch
 def mask_lines_cuda(img):
     '''
     img: torch.Tensor (Gray) with shape (B, H, W)
@@ -179,6 +180,10 @@ def xcorr2_fft_cpu(a, b):
 
 
 def xcorr2_fft_cuda(a, b):
+    '''
+    a, b: (B, M, N)
+    -> result: (B, M, N)
+    '''
     # b の共役転置を計算
     a = a[0]
     b_conj_rot = torch.rot90(b[0].conj(), 2, [0, 1])
@@ -195,31 +200,44 @@ def _convnfft_cuda(A, B, dims=None):
     if isinstance(dims, int):
         dims = [dims]
 
-    # Define the length function for FFT
-    lfftfun = lambda l: 2**int(np.ceil(np.log2(l)))
-
     original_sizes = [A.size(dim) + B.size(dim) - 1 for dim in dims]
 
+    fshape = [sp_fft.next_fast_len(original_sizes[d], True) for d in dims]
+
     # FFT and IFFT along the specified dimensions
-    for dim in dims:
-        m = A.size(dim)
-        n = B.size(dim)
-        l = lfftfun(m + n - 1)
 
-        A = torch.fft.fft(A, n=l, dim=dim)
-        B = torch.fft.fft(B, n=l, dim=dim)
+    spA = torch.fft.rfftn(A, fshape, dim=dims)
+    spB = torch.fft.rfftn(B, fshape, dim=dims)
 
-    # Element-wise multiplication in the Fourier domain
-    A = A * B
+    ret = torch.fft.irfftn(spA * spB, fshape, dim=dims)
 
-    # Inverse FFT
-    for dim in dims:
-        A = torch.fft.ifft(A, dim=dim).real
+    fslice = tuple([slice(sz) for sz in original_sizes])
+    ret = ret[fslice]
 
-    # Truncate the result based on the shape
-    slices = [slice(None)] * A.ndim
-    for dim, size in zip(dims, original_sizes):
-        slices[dim] = slice(0, size)
+    return ret
 
-    A = A[tuple(slices)]
-    return A
+    # # Define the length function for FFT
+    # lfftfun = lambda l: 2**int(np.ceil(np.log2(l)))
+
+    # for dim in dims:
+    #     m = A.size(dim)
+    #     n = B.size(dim)
+    #     l = lfftfun(m + n - 1)
+
+    #     A = torch.fft.fft(A, n=l, dim=dim)
+    #     B = torch.fft.fft(B, n=l, dim=dim)
+
+    # # Element-wise multiplication in the Fourier domain
+    # A = A * B
+
+    # # Inverse FFT
+    # for dim in dims:
+    #     A = torch.fft.ifft(A, dim=dim).real
+
+    # # Truncate the result based on the shape
+    # slices = [slice(None)] * A.ndim
+    # for dim, size in zip(dims, original_sizes):
+    #     slices[dim] = slice(0, size)
+
+    # A = A[tuple(slices)]
+    # return A

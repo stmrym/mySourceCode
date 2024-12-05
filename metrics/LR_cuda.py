@@ -3,6 +3,7 @@ import cpbd
 import numpy as np
 from skimage.transform import resize
 import torch
+import torch.nn.functional as F
 
 import sys
 import os
@@ -10,7 +11,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__)))
 
 from utils.tensor_util import img2tensor, tensor2img, tensor_rgb2gray
 from utils.util import gradient_cuda, mean_norm_cuda, my_sd_cuda
-from utils.util import mean_norm, my_sd 
 from utils.AnisoSetEst_cuda import MetricQ_cuda
 from utils.AnisoSetEst import MetricQ
 from utils.denoise_cuda import Denoise
@@ -19,15 +19,13 @@ from utils.compute_ncc_cuda import compute_ncc_cuda
 from utils.CPBD_compute import cpbd_compute
 
 from utils.pyr_ring import align, grad_ring
-from utils.pyr_ring_cuda import align_cuda
+from utils.pyr_ring_cuda import align_cuda, grad_ring_cuda
 from utils.stop_watch import stop_watch
-
+from utils.debug_util import matrix_imshow
 
 class LR_Cuda:
     def __init__(self, device, **kwargs):
         self.device = device
-
-
 
     @stop_watch
     def calculate(self, img1, img2, **kwargs):
@@ -62,22 +60,16 @@ class LR_Cuda:
         # cv2.imwrite('denoised.png', np.clip(denoised_np*255, 0, 255).astype(np.uint8))
         
         features['auto_corr'] = self._auto_corr(denoised)
-
-        # print(denoised.shape)
         # features['auto_corr'] = self._auto_corr_cpu(denoised)
-
         features['norm_sps'] = self._norm_sparsity(denoised)
         features['cpbd'] = self._calc_cpbd(denoised)
-        # features['cpbd'] = self._calc_cpbd_cpu(denoised)
-        
+
+
 
         features['pyr_ring'] = self._pyr_ring(denoised, blurred)
+        # features['pyr_ring'] = self._pyr_ring_cpu(denoised, blurred)
         features['saturation'] = self._saturation(deblurred)
         
-        denoised = tensor2img(denoised)
-        blurred = tensor2img(blurred)
-        deblurred = tensor2img(deblurred)
-
         score = (features['sparsity']   * -8.70515   +
                 features['smallgrad']  * -62.23820  +
                 features['metric_q']   * -0.04109   +
@@ -258,23 +250,46 @@ class LR_Cuda:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         return -cpbd.compute(img)
 
-
+    @stop_watch
     def _pyr_ring(self, img, blurred):
         '''
         img: torch.Tensor (RGB) with shape (B, C, H, W)
         '''
-        device = img.device
         img, blurred = align_cuda(img, blurred, True)
 
+        _, _, h, w = img.shape
+        
+        result = 0.0
+        sizes = []
+        j = 0
 
+        while True:
+            coef = 0.5 ** j
+            cur_height = round(h * coef)
+            cur_width = round(w * coef)
+            if min(cur_height, cur_width) < 16:
+                break
+            sizes.append([j, cur_width, cur_height])
 
+            cur_img = F.interpolate(img, size=(cur_height, cur_width), mode='bilinear', align_corners=False)
+            cur_blurred = F.interpolate(blurred, size=(cur_height, cur_width), mode='bilinear', align_corners=False)
+
+            diff = grad_ring_cuda(cur_img, cur_blurred)
+            if j > 0:
+                result += torch.mean(diff)
+            j += 1
+        
+        return result.item()
 
 
     @stop_watch
     def _pyr_ring_cpu(self, img, blurred):
 
+        img = tensor2img(img)
+        blurred = tensor2img(blurred)
+
         img, blurred = align(img, blurred, True)
-        height, width, color_count = img.shape
+        height, width, _ = img.shape  
 
         result = 0.0
         sizes = []
@@ -295,12 +310,28 @@ class LR_Cuda:
                 result += np.mean(diff)
 
             j += 1
+        
+        return result
+
+    @stop_watch
+    def _saturation(self, img):
+        max_values = torch.max(img, dim=-3).values
+
+        mask_low = max_values <= (10.0/255.0)
+        result_low = mask_low.sum().item() / max_values.numel()
+
+        min_values = torch.min(img, dim=-3).values
+
+        mask_high = min_values >= (1.0 - (10.0/255.0))
+        result_high = mask_high.sum().item() / min_values.numel()
+
+        result = result_low + result_high
 
         return result
 
 
     @stop_watch
-    def _saturation(self, img):
+    def _saturation_cpu(self, img):
         # 各ピクセルの最大値を計算
         max_values = np.max(img, axis=2)
         

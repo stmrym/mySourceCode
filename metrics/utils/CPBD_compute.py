@@ -138,7 +138,7 @@ def cpbd_compute(image):
 
     return sharpness_metric
 
-@stop_watch
+# @stop_watch
 def _marziliano_method(edges, image):
     '''
     edges: torch.tensor [0,1] with shape (H, W)
@@ -316,7 +316,7 @@ def count_values(tensor):
     unique_elements, counts = torch.unique(tensor, return_counts=True)
     print(unique_elements, counts)
 
-@stop_watch
+# @stop_watch
 def _calculate_sharpness_metric(image, edges, edge_widths):
     # get the size of image
 
