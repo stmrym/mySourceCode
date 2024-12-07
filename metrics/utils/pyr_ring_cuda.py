@@ -173,6 +173,7 @@ def grad_ring_cuda(latent, ref):
     g = torch.sqrt(gx**2 + gy**2)
 
     filter_width = max(max(latent.shape[-3:]) // 200, 1)
+    filter_width += filter_width % 2 - 1
     emask = (g > 0.03).float()
 
     kernel = torch.ones((3,1,filter_width, filter_width), device=latent.device)

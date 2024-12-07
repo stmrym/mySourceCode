@@ -11,6 +11,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(__file__))
 
+from tensor_util import tensor2img
 from util import gradient_cuda
 from stop_watch import stop_watch
 
@@ -81,7 +82,7 @@ def compute_ncc_cuda(img, ref, margin):
 
 
 
-@stop_watch
+# @stop_watch
 def mask_lines_cuda(img):
     '''
     img: torch.Tensor (Gray) with shape (B, H, W)
@@ -97,30 +98,46 @@ def mask_lines_cuda(img):
     m, e = kornia.filters.canny(img.unsqueeze(1), low_threshold=low_thr, high_threshold=high_thr)
     e = e.squeeze(1)
 
-    filter = torch.ones((1,1,3,3), device=img.device)
+    filter = torch.ones((1,1,5,5), device=img.device)
 
     e_np = _tensor2ndarray(e[0])
 
-    cur_mask_l = []
-    for _ in range(20):
-        cur_mask = mask_line_cuda(e_np)
-        cur_mask_l.append(cur_mask)
+    # cur_mask_l = []
+    # for i in range(1):
+    #     cur_mask = mask_line_cuda(e_np, i)
+    #     cur_mask_l.append(cur_mask)
         
-    for cur_mask in cur_mask_l:
+    # for cur_mask in cur_mask_l:
 
-        cur_mask = _ndarray2tensor(cur_mask, img.device).unsqueeze(0)
-        e[cur_mask] = False
+    #     cur_mask = _ndarray2tensor(cur_mask, img.device).unsqueeze(0)
+    #     e[cur_mask] = False
         
-        #  (1,H,W) -> (1,1,H,W)
-        cur_mask = cur_mask.float().unsqueeze(0)
-        cur_mask = F.conv2d(cur_mask, filter, padding=1)
-        cur_mask = cur_mask.squeeze(0) > 0
-        mask[cur_mask] = True
+    #     #  (1,H,W) -> (1,1,H,W)
+    #     cur_mask = cur_mask.float().unsqueeze(0)
+    #     cur_mask = F.conv2d(cur_mask, filter, padding=filter.shape[-1]//2)
+    #     cur_mask = cur_mask.squeeze(0) > 0
+    #     mask[cur_mask] = True
+
+
+    cur_mask = mask_line_cuda(e_np, 0)
+    cur_mask = _ndarray2tensor(cur_mask, img.device).unsqueeze(0)
+    e[cur_mask] = False
+    
+    #  (1,H,W) -> (1,1,H,W)
+    cur_mask = cur_mask.float().unsqueeze(0)
+    cur_mask = F.conv2d(cur_mask, filter, padding=filter.shape[-1]//2)
+    cur_mask = cur_mask.squeeze(0) > 0
+    mask[cur_mask] = True
+
+
+    # mask_image = np.clip(mask[0].cpu().numpy().astype(np.int8)*255, 0, 255).astype(np.uint8)
+    # cv2.imwrite('debug_mask.png', mask_image)
+
 
     return mask
 
 # @stop_watch
-def mask_line_cuda(e_np):
+def mask_line_cuda(e_np, seed=0):
     '''
     e: canny edge torch.Tensor with shape (1, H, W)
     
@@ -129,7 +146,8 @@ def mask_line_cuda(e_np):
     # e_np = _tensor2ndarray(e[0])
 
     # [((x1s, y1s), (x1e, y1e)), ((x2s, y2s), (x2e, 2ye)), ...]
-    lines = probabilistic_hough_line(e_np, threshold=10, line_length=20, line_gap=8)
+    lines = probabilistic_hough_line(e_np, threshold=10, line_length=20, line_gap=8, rng=seed)
+    
     mask = np.zeros(e_np.shape)
 
     for line in lines:

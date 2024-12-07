@@ -13,7 +13,6 @@ def SVDCoherence(gx, gy):
     gyvect = gy.ravel('F')
 
     grad = np.vstack((gxvect, gyvect)).T
-    
     U, S, Vt = np.linalg.svd(grad, full_matrices=False)
 
     s1 = float(S[0])
@@ -25,7 +24,6 @@ def SVDCoherence(gx, gy):
         co = np.abs(s1 - s2) / (s1 + s2)
 
     return co, np.abs(s1)
-
 
 def MetricQ(img, N):
     H, W = img.shape
@@ -39,7 +37,6 @@ def MetricQ(img, N):
     thresh = np.sqrt((1 - thresh) / (1 + thresh))
 
     Q = 0
-
     for m in range(h):
         for n in range(w):
             AOI = img[N * m:N * (m + 1), N * n:N * (n + 1)]

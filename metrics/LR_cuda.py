@@ -27,7 +27,7 @@ class LR_Cuda:
     def __init__(self, device, **kwargs):
         self.device = device
 
-    @stop_watch
+    # @stop_watch
     def calculate(self, img1, img2, **kwargs):
         '''
         img1: deblurred image: ndarray (BGR) [0, 255] with shape (H, W, C)
@@ -37,10 +37,9 @@ class LR_Cuda:
         img2_tensor = img2tensor((img2/255).astype(np.float32), self.device)
 
         score, features = self._measure(deblurred=img1_tensor, blurred=img2_tensor)
-        print(score, features)
+        # print(score, features)
         return score
     
-    @stop_watch
     def _measure(self, deblurred, blurred):
         '''
         deblurred: torch.Tensor (RGB) [0,1] with shape (B, C, H, W)
@@ -50,7 +49,7 @@ class LR_Cuda:
 
         features['sparsity'] = self._sparsity(deblurred)
         features['smallgrad'] = self._smallgrad(deblurred)
-        features['metric_q'] = self._metric_q(deblurred)
+        features['metric_q'] = self._metric_q_cpu(deblurred)
 
         # denoise = Denoise(self.device)
         # denoised = denoise.denoise(deblurred)
@@ -61,6 +60,7 @@ class LR_Cuda:
         
         features['auto_corr'] = self._auto_corr(denoised)
         # features['auto_corr'] = self._auto_corr_cpu(denoised)
+ 
         features['norm_sps'] = self._norm_sparsity(denoised)
         features['cpbd'] = self._calc_cpbd(denoised)
 
@@ -82,7 +82,7 @@ class LR_Cuda:
         return score, features
     
 
-    @stop_watch
+    # @stop_watch
     def _sparsity(self, img):
         '''
         img: torch.Tensor (RGB) with shape (B, C, H, W)
@@ -95,7 +95,7 @@ class LR_Cuda:
         return result.cpu().item()
 
 
-    @stop_watch
+    # @stop_watch
     def _smallgrad(self, img):
         '''
         img: torch.Tensor (RGB) with shape (B, C, H, W)
@@ -114,8 +114,8 @@ class LR_Cuda:
         return result.cpu().item()
     
 
-    @stop_watch
-    def _metric_q_cuda(self, img):
+    # @stop_watch
+    def _metric_q(self, img):
         '''
         img: torch.Tensor (RGB) with shape (B, C, H, W)
         '''
@@ -125,17 +125,17 @@ class LR_Cuda:
         return result.cpu().item()
     
 
-    @stop_watch
-    def _metric_q(self, img):
+    # @stop_watch
+    def _metric_q_cpu(self, img):
         PATCH_SIZE = 8
 
         img = tensor2img(img)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) * 255
         result = -MetricQ(img, PATCH_SIZE)
-        return -result
+        return result
 
 
-    @stop_watch
+    # @stop_watch
     def _auto_corr(self, img):
         '''
         img: torch.Tensor (RGB) with shape (B, C, H, W)
@@ -179,8 +179,10 @@ class LR_Cuda:
         return result.cpu().item()
 
 
-    # @stop_watch
+    @stop_watch
     def _auto_corr_cpu(self, img):
+
+        img = tensor2img(img)
 
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -209,7 +211,7 @@ class LR_Cuda:
         return result
 
 
-    @stop_watch
+    # @stop_watch
     def _norm_sparsity(self, img):
         '''
         img: torch.Tensor (RGB) with shape (B, C, H, W)
@@ -224,7 +226,7 @@ class LR_Cuda:
         return result.cpu().item()        
         
 
-    @stop_watch
+    # @stop_watch
     def _calc_cpbd(self, img):
         '''
         img: torch.Tensor (RGB) with shape (B, C, H, W)
@@ -250,7 +252,7 @@ class LR_Cuda:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         return -cpbd.compute(img)
 
-    @stop_watch
+    # @stop_watch
     def _pyr_ring(self, img, blurred):
         '''
         img: torch.Tensor (RGB) with shape (B, C, H, W)
@@ -313,7 +315,7 @@ class LR_Cuda:
         
         return result
 
-    @stop_watch
+    # @stop_watch
     def _saturation(self, img):
         max_values = torch.max(img, dim=-3).values
 
@@ -359,11 +361,27 @@ if __name__ == '__main__':
 
     params = {'device': 'cuda:0'}
 
-    deblurred = cv2.imread('source_code_m/deblurred.png')
-    blurred = cv2.imread('source_code_m/blurry.png')
+    deblurred_l = [
+        'source_code_m/deblurred.png',
+        'source_code_m/input.png',
+        'source_code_m/ESTDAN_out.png',
+        'source_code_m/R-ESTDAN_out.png'
+    ]
+
+    blurred_l = [
+        'source_code_m/blurry.png',
+        'source_code_m/input.png',
+        'source_code_m/input.png',
+        'source_code_m/input.png'
+    ]
 
     metric = LR_Cuda(**params)
 
-    result = metric.calculate(img1=deblurred, img2=blurred)
 
-    print(f'LR_cuda: {result:.3f}')
+    for deblurred_path, blurred_path in zip(deblurred_l, blurred_l):
+
+        deblurred = cv2.imread(deblurred_path)
+        blurred = cv2.imread(blurred_path)
+
+        result = metric.calculate(img1=deblurred, img2=blurred)
+        print(f'{deblurred_path}, {blurred_path}, LR_cuda: {result:.3f}\n')

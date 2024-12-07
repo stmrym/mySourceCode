@@ -7,7 +7,7 @@ sys.path.append(os.path.dirname(__file__))
 
 from stop_watch import stop_watch
 
-@stop_watch
+# @stop_watch
 def img2tensor(img, device):
     '''
     ndarray (BGR) with shape(H, W, C) -> tensor (RGB) with shape (1, C, H, W)
