@@ -7,10 +7,10 @@ import torch.nn.functional as F
 
 import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(__file__)))
+sys.path.append(os.path.dirname(__file__))
 
 from utils.tensor_util import img2tensor, tensor2img, tensor_rgb2gray
-from utils.util import gradient_cuda, mean_norm_cuda, my_sd_cuda
+from utils.grad_util import gradient_cuda, mean_norm_cuda, my_sd_cuda
 from utils.AnisoSetEst_cuda import MetricQ_cuda
 from utils.AnisoSetEst import MetricQ
 from utils.denoise_cuda import Denoise
@@ -23,20 +23,20 @@ from utils.pyr_ring_cuda import align_cuda, grad_ring_cuda
 from utils.stop_watch import stop_watch
 from utils.debug_util import matrix_imshow
 
-class LR_Cuda:
-    def __init__(self, device, **kwargs):
+
+
+class LR:
+    def __init__(self, device, use_denoise=False, **kwargs):
         self.device = device
+        self.use_denoise = use_denoise
 
     # @stop_watch
-    def calculate(self, img1, img2, **kwargs):
+    def calculate(self, recons, lq, **kwargs):
         '''
-        img1: deblurred image: ndarray (BGR) [0, 255] with shape (H, W, C)
-        img2: blurred image: ndarray (BGR) [0, 255] with shape (H, W, C)
+        recons  : deblurred tesnor: torch.Tensor (RGB) [0, 1] with shape (N, C, H, W)
+        lq      : blurred tensor: torch.Tensor (RGB) [0, 1] with shape (N, C, H, W)
         '''
-        img1_tensor = img2tensor((img1/255).astype(np.float32), self.device)
-        img2_tensor = img2tensor((img2/255).astype(np.float32), self.device)
-
-        score, features = self._measure(deblurred=img1_tensor, blurred=img2_tensor)
+        score, features = self._measure(deblurred=recons, blurred=lq)
         # print(score, features)
         return score
     
@@ -47,27 +47,26 @@ class LR_Cuda:
         '''
         features = {}
 
+        # For noise features
         features['sparsity'] = self._sparsity(deblurred)
         features['smallgrad'] = self._smallgrad(deblurred)
         features['metric_q'] = self._metric_q_cpu(deblurred)
 
-        # denoise = Denoise(self.device)
-        # denoised = denoise.denoise(deblurred)
-        denoised = deblurred
+        if self.use_denoise:
+            denoiser = Denoise(self.device)
+            denoised = denoiser.denoise(self.device)
+            # denoised_np = self._tensor2img(denoised)
+            # cv2.imwrite('denoised.png', np.clip(denoised_np*255, 0, 255).astype(np.uint8))
+        else:
+            denoised = deblurred
 
-        # denoised_np = self._tensor2img(denoised)
-        # cv2.imwrite('denoised.png', np.clip(denoised_np*255, 0, 255).astype(np.uint8))
-        
-        features['auto_corr'] = self._auto_corr(denoised)
-        # features['auto_corr'] = self._auto_corr_cpu(denoised)
- 
+        # For sharpness features
+        features['auto_corr'] = self._auto_corr(denoised) 
         features['norm_sps'] = self._norm_sparsity(denoised)
         features['cpbd'] = self._calc_cpbd(denoised)
 
-
-
+        # For ringing features
         features['pyr_ring'] = self._pyr_ring(denoised, blurred)
-        # features['pyr_ring'] = self._pyr_ring_cpu(denoised, blurred)
         features['saturation'] = self._saturation(deblurred)
         
         score = (features['sparsity']   * -8.70515   +
@@ -361,27 +360,25 @@ if __name__ == '__main__':
 
     params = {'device': 'cuda:0'}
 
-    deblurred_l = [
-        'source_code_m/deblurred.png',
-        'source_code_m/input.png',
-        'source_code_m/ESTDAN_out.png',
-        'source_code_m/R-ESTDAN_out.png'
-    ]
-
     blurred_l = [
-        'source_code_m/blurry.png',
-        'source_code_m/input.png',
-        'source_code_m/input.png',
-        'source_code_m/input.png'
+        '/mnt/d/results/20241210/074_00000034_input.png'
     ]
 
-    metric = LR_Cuda(**params)
+    deblurred_l = [
+        '/mnt/d/results/20241210/074_00000034_output.png'
+    ]
+
+    metric = LR(**params)
 
 
     for deblurred_path, blurred_path in zip(deblurred_l, blurred_l):
 
-        deblurred = cv2.imread(deblurred_path)
-        blurred = cv2.imread(blurred_path)
+        deblurred = cv2.imread(deblurred_path)/255
+        blurred = cv2.imread(blurred_path)/255
 
-        result = metric.calculate(img1=deblurred, img2=blurred)
-        print(f'{deblurred_path}, {blurred_path}, LR_cuda: {result:.3f}\n')
+        print(deblurred*255)
+        print(blurred*255)
+        exit()
+
+        result = metric.calculate(recons=deblurred, lq=blurred)
+        print(f'{deblurred_path}, {blurred_path}, LR: {result:.3f}\n')

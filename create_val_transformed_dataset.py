@@ -66,11 +66,12 @@ if __name__ == '__main__':
     
     # base_tmpl = '/mnt/d/dataset/BSD_2ms16ms/test'
     base_dir = '../dataset/BSD_2ms16ms/train/blur'
-    dst_dir = '../dataset/BSD_2ms16ms_comp2/test/blur'
+    dst_dir = '../dataset/BSD_2ms16ms_VT3/test/blur'
     
     seq = '067'
     file_name = '00000040.png'
-
+    # seq = None
+    # file_name = None
 
     with open('create_val_transformed_dataset.yml', mode='r') as f:
         opt = yaml.safe_load(f)

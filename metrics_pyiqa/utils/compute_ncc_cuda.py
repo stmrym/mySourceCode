@@ -12,7 +12,7 @@ import os
 sys.path.append(os.path.dirname(__file__))
 
 from tensor_util import tensor2img
-from util import gradient_cuda
+from grad_util import gradient_cuda
 from stop_watch import stop_watch
 
 

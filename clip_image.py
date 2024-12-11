@@ -4,10 +4,10 @@ import numpy as np
 from typing import List
 
 
-def clip_image() -> None:
+def clip_center_image() -> None:
 
-    path = '/mnt/d/results/SIP_202408/presentation_fig/000019_b.png'
-    save_path = '/mnt/d/results/SIP_202408/presentation_fig/000019_b_clip.png'
+    path = '/mnt/d/results/20241210/00000040_blur.png'
+    save_path = '/mnt/d/results/20241210/00000040_blur_clip_unsharp.png'
 
     img = cv2.imread(path)
     h, w, _ = img.shape
@@ -17,6 +17,21 @@ def clip_image() -> None:
 
     print(clipped_image.shape)
     cv2.imwrite(save_path, clipped_image)
+
+
+
+
+def clip_image(path: str, save_name: str, scale_list: List[float], xywh_list: List[tuple], **kwargs) -> None:
+
+    img = cv2.imread(path)
+
+    x, y, w, h = xywh_list[0]
+    scale = scale_list[0]
+
+    clipped = cv2.resize(img[y:y+h, x:x+w], dsize=None, fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
+
+    print(clipped.shape)
+    cv2.imwrite(save_name, clipped)
     
 
 def add_patch_inside(path: str, save_name: str, thick_size: int, scale_list: List[float], loc_list: List[str], xywh_list: List[tuple], color_list: List[tuple], **kwargs) -> None:
@@ -24,7 +39,6 @@ def add_patch_inside(path: str, save_name: str, thick_size: int, scale_list: Lis
     assert img is not None, 'image empty.'
     img_h, img_w, _ = img.shape
 
-    
     for (x, y, w, h), color, loc, scale in zip(xywh_list, color_list, loc_list, scale_list):
 
         clip = cv2.resize(img[y:y+h, x:x+w], dsize=None, fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
@@ -84,17 +98,17 @@ def add_patch_outside(path: str, save_name: str, thick_size: int, xywh_list: Lis
 
 if __name__ == '__main__':
 
-    name = '00000143_e_woLf'
+    name = '067_00000040_k7_w2'
     kwargs = {
-        'path' : '/mnt/d/results/SIP_202408/result_src/%s.png' % name,
-        'save_name' : '/mnt/d/results/SIP_202408/result_fig/%s.png' % name,
+        'path' : '/mnt/d/results/20241210/%s.png' % name,
+        'save_name' : '/mnt/d/results/20241210/%s_clip_unsharp.png' % name,
         'xywh_list' : [
-            # 00000143
-            (340, 270, 100, 60),
-            # 003012
-            # (1000, 60, 150, 140),
-            # 00000020
-            # (255, 200, 170, 90),
+            # 0000045
+            # (120, 340, 210, 90),
+            # 0000045_char
+            (200, 345, 80, 80),
+            # 000030
+            # (245, 49, 80, 80),
             # (470, 260, 140, 140),
         ],
         'color_list': [
@@ -103,10 +117,11 @@ if __name__ == '__main__':
             (255,0,0)
         ],
         'thick_size' : 4,
-        'scale_list' : [3.5,],
+        'scale_list' : [4,],
         'loc_list': ['ur',]
     }
 
     # add_patch_outside(**kwargs)
-    add_patch_inside(**kwargs)
+    # add_patch_inside(**kwargs)
+    clip_image(**kwargs)
     # clip_image()

@@ -503,12 +503,20 @@ def niqe(img, mu_pris_param, cov_pris_param, gaussian_window, block_size_h=96, b
 
 
 if __name__ == '__main__':
-    params = {'crop_border': 0}
 
-    deblurred = cv2.imread('./source_code_m/deblurred.png')
+    params = {'crop_border': 0}
+    
+    deblurred_l = [
+        '/mnt/d/results/20241210/074_00000034_output.png'
+    ]
+
 
     metric = NIQE(**params)
 
-    result = metric.calculate(img1=deblurred)
 
-    print(f'NIQE: {result:.3f}')
+    for deblurred_path in deblurred_l:
+        deblurred = cv2.imread(deblurred_path)
+
+        result = metric.calculate(img1=deblurred)
+        print(f'{deblurred_path}, NIQE: {result:.3f}\n')
+

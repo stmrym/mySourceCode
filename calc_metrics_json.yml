@@ -1,8 +1,12 @@
-    # PSNR:
-      # crop_border: 0
-      # max_order: 255.0
-    # SSIM:
+    PSNR:
+      crop_border: 0
+      max_order: 255.0
+    SSIM:
+    LPIPS:
     NIQE:
       crop_border: 0
+    LR:
+      device: 'cuda:0'
+      use_denoise: false
     # BRISQUE:
     

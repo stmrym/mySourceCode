@@ -1,0 +1,8 @@
+    PSNR:
+    SSIM:
+    NIQE:
+    LPIPS:
+    LR:
+      use_denoise: false
+    # BRISQUE:
+    

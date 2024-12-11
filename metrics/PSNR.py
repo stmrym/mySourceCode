@@ -1,4 +1,8 @@
+import cv2
 import numpy as np
+
+
+
 
 class PSNR:
     def __init__(self, crop_border=0, max_order=255.0):
@@ -34,3 +38,30 @@ class PSNR:
         if mse == 0:
             return float('inf')
         return 10. * np.log10(self.max_order * self.max_order / mse)
+    
+
+if __name__ == '__main__':
+
+    params = {'crop_border': 0,
+            'max_order': 255.0
+            }
+    
+    recons_l = [
+        '/mnt/d/results/20241210/074_00000034_output.png'
+    ]
+
+    gt_l = [
+        '/mnt/d/results/20241210/074_00000034_gt.png'
+    ]
+
+
+    metric = PSNR(**params)
+
+
+    for recons_path, gt_path in zip(recons_l, gt_l):
+
+        recons = cv2.imread(recons_path)
+        gt = cv2.imread(gt_path)
+
+        result = metric.calculate(img1=recons, img2=gt)
+        print(f'{recons_path}, {gt_path}, PSNR: {result:.3f}\n')

@@ -51,18 +51,18 @@ if __name__ == '__main__':
     # img2_base_path = '../dataset/BSD_1ms8ms/test/GT'
     # save_name = '../dataset/BSD_1ms8ms_comp/input_brisque.json'
 
-    # img1_base_path = '../dataset/Mi11Lite/test'
-    # img2_base_path = '../dataset/Mi11Lite/test'
-    # save_name = '../dataset/Mi11Lite/input_brisque.json'
+    img1_base_path = '../STDAN_modified/exp_log/train/2024-12-09T194830__VT3__ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/epoch-0300_Mi11Lite_output/'
+    img2_base_path = '../dataset/Mi11Lite/test'
+    save_name = 'input__short_NIQE_LR.json'
     
     # for test output
     # img1_base_path = '../STDAN_modified/exp_log/test/2024-11-12T073940__CT_/epoch-0400_BSD_1ms8ms_output/'
     # img2_base_path = '../dataset/BSD_1ms8ms/test/GT'
     # save_name = '../STDAN_modified/exp_log/test/2024-11-12T073940__CT_/epoch-0400_BSD_1ms8ms_output_brisque.json'
 
-    img1_base_path = '../STDAN_modified/exp_log/train/2024-11-30T062157_T_change_transform_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/epoch-0500_Mi11Lite_output/'
-    img2_base_path = '../dataset/Mi11Lite/test'
-    save_name = 'E_epoch-0500.json'
+    # img1_base_path = '../STDAN_modified/exp_log/train/2024-12-09T194830__VT3__ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/epoch-0300_Mi11Lite_output/'
+    # img2_base_path = '../dataset/Mi11Lite/test'
+    # save_name = 'VT3_e0300.json'
 
     # for train output
     # img1_base_path = '../STDAN_modified/exp_log/train/2024-11-12T120452_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/epoch-0400_BSD_2ms16ms_output/'
@@ -86,7 +86,7 @@ if __name__ == '__main__':
 
     img1_seq_path_l = get_seq_path(img1_base_path, specific_seq)
 
-    for img1_seq_path in img1_seq_path_l:
+    for img1_seq_path in img1_seq_path_l[0:2]:
         seq = img1_seq_path.name
         img1_path_l = sorted(list((img1_seq_path).rglob('*.png')))
 

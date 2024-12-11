@@ -238,15 +238,20 @@ class UnsharpMasking:
             self.smoothing_kernel = np.matmul(smoothing, smoothing.transpose())
 
             smoothed =  cv2.filter2D(img, -1, self.smoothing_kernel)
-            laplacian = cv2.Laplacian(smoothed, cv2.CV_32F, ksize=3)
+            laplacian = cv2.Laplacian(smoothed.astype(np.float32), cv2.CV_32F, ksize=3)
 
             # mask = np.float32(np.abs(residue) * 255 > self.threshold)    
             mask = np.float32(np.abs(laplacian) * 255 > self.threshold)    
             soft_mask = cv2.filter2D(mask, -1, self.kernel)
 
-            sharpened = np.clip(img + self.weight * residue, 0, 1)
+            # cv2.imwrite('00000040_lap_mask.png', np.clip(mask.astype(np.float32)*255, 0, 255).astype(np.uint8))
+            # cv2.imwrite('00000040_default_lap_soft_mask.png', np.clip(soft_mask.astype(np.float32)*255, 0, 255).astype(np.uint8))
 
+
+            sharpened = np.clip(img + self.weight * residue, 0, 1)
             outputs.append(soft_mask * sharpened + (1 - soft_mask) * img)
+            # outputs.append(sharpened)
+            print(self.kernel.shape, self.weight)
 
         if is_single_image:
             outputs = outputs[0]
