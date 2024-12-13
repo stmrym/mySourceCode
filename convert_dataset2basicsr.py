@@ -2,8 +2,8 @@ import glob
 import os
 import shutil
 
-src = '../dataset/BSD_3ms24ms/valid/*'
-dst = '../dataset/BSD_3ms24ms/valid_basic'
+src = '../dataset/BSD_3ms24ms_original/test/*'
+dst = '../dataset/BSD_3ms24ms/test_basic'
 
 src_seq_list = sorted(glob.glob(src))
 
