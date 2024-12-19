@@ -34,7 +34,7 @@ def plot_plotly(df):
     
     fig.update_layout(title='Scatter Matrix with sequences')
     # fig.show()
-    fig.write_html('scatter_matrix.html')
+    fig.write_html('scatter_matrix_1200.html')
 
 
 def plot_sns(df):
@@ -42,18 +42,18 @@ def plot_sns(df):
     corr = df.drop(columns=['Seq']).corr()
     plt.rcParams['axes.labelsize'] = 24
     sns.pairplot(df, hue='Seq')
-    plt.savefig('scatter_matrix.png', bbox_inches='tight', pad_inches=0.04, dpi=200)
+    plt.savefig('scatter_matrix_1200.png', bbox_inches='tight', pad_inches=0.04, dpi=200)
 
     plt.close()
 
     sns.heatmap(corr, cbar = True, square = True, vmin = -1.0, vmax =  1.0, center = 0, annot = True, annot_kws={ 'size':15 },
 	fmt='.2f', xticklabels = corr.columns.values, yticklabels = corr.columns.values,)
-    plt.savefig('scatter_corr_matrix.png', bbox_inches='tight', pad_inches=0.04, dpi=300)
+    plt.savefig('scatter_corr_matrix_1200.png', bbox_inches='tight', pad_inches=0.04, dpi=300)
 
 
 if __name__ == '__main__':
 
-    json_path = '../STDAN_modified/exp_log/test/2024-12-10T130843__ESTDAN_VT3_e300_/epoch-0300_BSD_3ms24ms.json'
+    json_path = '../STDAN_modified/exp_log/test/2024-12-16T121335_VT3_ESTDAN_v3_BSD_3ms24ms/epoch-1200_BSD_3ms24ms.json'
 
     with open(json_path, 'r') as file:
         data = json.load(file)
@@ -69,7 +69,7 @@ if __name__ == '__main__':
 
     print(flattened_df)
 
-    # plot_plotly(flattened_df)
-    plot_sns(flattened_df)
+    plot_plotly(flattened_df)
+    # plot_sns(flattened_df)
 
 

@@ -67,13 +67,13 @@ if __name__ == '__main__':
     # seq = '121'
     seq = 'VID_20240523_163120'
     # frame = '00000006.png'
-    frame = '00047.png'
+    frame = '00081.png'
     # exp = '2024-11-21T192622_C_ESTDAN_v3_BSD_3ms24ms_GOPRO'
-    # exp = '2024-11-18T170527_CT_ESTDAN_v3_BSD_3ms24ms_GOPRO'
-    exp = '2024-12-04T192800__ESTDAN_v3_BSD_1ms8ms_BSD_2ms16ms_BSD_3ms24ms_GOPRO'
+    exp = '2024-12-16T180921__STDAN_Mi11Lite'
+    # exp = '2024-12-11T210210__VT3__ESTDAN_v3_BSD_3ms24ms_GOPRO'
 
     input_path = Path('../dataset') / dataset / 'test' / seq / frame
-    video_base_path = Path('../STDAN_modified/exp_log/train/') / exp / 'visualization'
+    video_base_path = Path('../STDAN_modified/exp_log/test/') / exp / 'visualization'
     pattern = Path('epoch-*_'+ dataset + '_output') / seq / frame
 
     output_dir = ''

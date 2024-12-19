@@ -18,7 +18,7 @@ plot SSIM graph
 '''
 
 class dataPlot():
-    def __init__(self, json_path, **kwargs):
+    def __init__(self, json_path, seq, metric, **kwargs):
         self.json_dict = self._read_json(json_path)
         self.kwargs = kwargs
 
@@ -37,8 +37,6 @@ class dataPlot():
         ax.plot(self.frame_l, self.value_l, **self.kwargs)
 
 
-seq = 'VID_20240523_163625'
-metric = 'NIQE'  # PSNR, SSIM, BRISQUE
 
 
 if __name__ == '__main__':
@@ -50,61 +48,85 @@ if __name__ == '__main__':
     # epoch-0400_Mi11Lite_output.json
     # epoch-0400_BSD_1ms8ms_output.json
     # epoch-0400_BSD_1ms8ms_comp_output.json
-    
-    save_name = seq + '_' + metric + '_graph.png'
-    font_size = 12
-    dpi = 200
-    print(seq, metric)
 
-    plot_list = [
-
-        dataPlot(json_path = 'stdan_result/E_epoch-0400.json',
-            ls='-', lw=1.0, c='black', label = 'ESTDAN epoch-0400',
-        ),
-
-        dataPlot(json_path = 'stdan_result/VT1_epoch-0500.json',
-            ls='-', lw=1.0, c='tab:orange', label = '+VT1 epoch-0500',
-        ),
-
-        dataPlot(json_path = 'stdan_result/VT2_epoch-0700.json',
-            ls='-', lw=1.0, c='magenta', label = '+VT2 epoch-0700',
-        )
-
-        # dataPlot(json_path = 'stdan_result.json',
-        #     ls='-', lw=1.0, c='tab:red', label = 'R-ESTDAN',
-        # )
+    seq_l = [
+        'VID_20240523_162610',
+        'VID_20240523_163120',
+        'VID_20240523_163623',
+        'VID_20240523_163625',
+        'VID_20240523_163720',
+        'VID_20240523_164307',
+        'VID_20240523_164327',
+        'VID_20240523_164408',
+        'VID_20240523_164506',
+        'VID_20240523_164507',
+        'VID_20240523_164838',
+        'VID_20240523_165048',
+        'VID_20240523_165103',
+        'VID_20240523_165150'
     ]
 
+    metric = 'LR'  # PSNR, SSIM, BRISQUE
 
-    ### plot graph ###
-    fig, ax = plt.subplots(figsize=(11,3))
+    for seq in seq_l:
+        save_name = seq + '_' + metric + '_graph.png'
+        font_size = 12
+        dpi = 200
+        print(seq, metric)
 
-    
+        plot_list = [
 
-    frame_min = plot_list[0].frame_l[0]
-    frame_max = plot_list[0].frame_l[-1]
-    ax.set_xlim([frame_min, frame_max])
-    # ax.set_ylim([40, 90])
-    ax.set_xlabel('frame', fontsize=font_size)
-    ax.set_ylabel(metric, fontsize=font_size)
+            dataPlot(json_path = '../STDAN_modified/exp_log/test/2024-12-16T180921__STDAN_Mi11Lite/epoch-0850_Mi11Lite.json',
+                seq=seq, metric=metric, ls='-', lw=1.0, c='black', label = 'STDAN epoch-0850',
+            ),
+
+            dataPlot(json_path = '../STDAN_modified/exp_log/test/2024-12-17T143130__ESTDAN_v3_Mi11Lite/epoch-0850_Mi11Lite.json',
+                seq=seq, metric=metric, ls='-', lw=1.0, c='tab:blue', label = 'ESTDAN epoch-0850',
+            ),
+
+            dataPlot(json_path = '../STDAN_modified/exp_log/test/2024-12-17T042142_LD_ESTDAN_v3_Mi11Lite/epoch-0150_Mi11Lite.json',
+                seq=seq, metric=metric, ls='-', lw=1.0, c='tab:orange', label = 'ESTDAN LD epoch-0150',
+            ),
+
+            dataPlot(json_path = '../STDAN_modified/exp_log/train/2024-12-11T210210__VT3__ESTDAN_v3_BSD_3ms24ms_GOPRO/epoch-0650_Mi11Lite.json',
+                seq=seq, metric=metric, ls='-', lw=1.0, c='tab:red', label = 'ESTDAN VT3 epoch-0650',
+            )
+
+            # dataPlot(json_path = 'stdan_result.json',
+            #     ls='-', lw=1.0, c='tab:red', label = 'R-ESTDAN',
+            # )
+        ]
 
 
-    for plot_obj in plot_list:
-        plot_obj.plot(ax)
+        ### plot graph ###
+        fig, ax = plt.subplots(figsize=(11,3))
 
-    # ax.legend(loc='lower left', ncol=4) 
-    #ax.legend(loc='upper center', bbox_to_anchor=(.5, -.20), ncol=3)
-    ax.minorticks_on()
-    ax.grid(which = "both", axis="x", alpha=0.5)
-    ax.grid(axis='y')
-    ax.legend() 
-    # ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-    ax.xaxis.set_major_locator(MultipleLocator(5))
-    ax.xaxis.set_minor_locator(MultipleLocator(1))
+        
 
-    # ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+        frame_min = plot_list[0].frame_l[0]
+        frame_max = plot_list[0].frame_l[-1]
+        ax.set_xlim([frame_min, frame_max])
+        # ax.set_ylim([40, 90])
+        ax.set_xlabel('frame', fontsize=font_size)
+        ax.set_ylabel(metric, fontsize=font_size)
 
-    plt.title(f'Seq.{seq}')
-    plt.tight_layout()
-    plt.savefig(save_name, transparent=False, dpi=dpi, bbox_inches='tight')
-    plt.close()
+
+        for plot_obj in plot_list:
+            plot_obj.plot(ax)
+
+        # ax.legend(loc='lower left', ncol=4) 
+        #ax.legend(loc='upper center', bbox_to_anchor=(.5, -.20), ncol=3)
+        ax.minorticks_on()
+        ax.grid(which = "both", axis="x", alpha=0.5)
+        ax.grid(axis='y')
+        ax.legend() 
+        # ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+        ax.xaxis.set_major_locator(MultipleLocator(5))
+        ax.xaxis.set_minor_locator(MultipleLocator(1))
+
+        # ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+
+        plt.title(f'Seq.{seq}')
+        plt.tight_layout()
+        plt.savefig(save_name, transparent=False, dpi=dpi, bbox_inches='tight')
+        plt.close()
