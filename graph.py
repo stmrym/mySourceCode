@@ -95,7 +95,6 @@ def plot_si_vs_sm():
     class_list = [
 
         # for CDF
-<<<<<<< HEAD
         # dataPlot(
         #         csv_path = '../STDAN_modified/STDANet_train_ckpt/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
         #         csv_avg_path = '../STDAN_modified/STDANet_train_ckpt/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
@@ -120,32 +119,6 @@ def plot_si_vs_sm():
         #         # facecolor = 'None',
         #         # edgecolors = 'red'
         #         ),  
-=======
-        dataPlot(
-                csv_path = '../STDAN_modified/STDANet_train_ckpt/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
-                csv_avg_path = '../STDAN_modified/STDANet_train_ckpt/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
-                label = 'STDAN',
-                c = 'blue',
-                # marker = '.',
-                # s = 5,
-                # linewidths = 1,
-                # facecolor = 'None',
-                # edgecolors = 'blue'
-                ),
-
-
-        dataPlot(
-                csv_path = '../STDAN_modified/STDANet_train_ckpt/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
-                csv_avg_path = '../STDAN_modified/STDANet_train_ckpt/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
-                label = r'ESTDAN + $\mathcal{L}_\mathrm{f}$ (Ours)',
-                c = 'red',
-                # marker = '.',
-                # s = 5,
-                # linewidths = 1,
-                # facecolor = 'None',
-                # edgecolors = 'red'
-                ),  
->>>>>>> 8780e6bad2834e7fa17e0e3d5d8f3ebe9684fd9a
 
         # for scatterplot
         # dataPlot(
