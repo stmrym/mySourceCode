@@ -39,36 +39,61 @@ def plot_plotly(df):
 
 def plot_sns(df):
 
+    # 1. plot scatter matrix
     corr = df.drop(columns=['Seq']).corr()
     plt.rcParams['axes.labelsize'] = 24
-    sns.pairplot(df, hue='Seq')
-    plt.savefig('scatter_matrix_1200.png', bbox_inches='tight', pad_inches=0.04, dpi=200)
+    g = sns.pairplot(df, hue='Seq')
+    
+    # FR-IQA to blue, NR-IQA to red
+    fr_iqa_l = ['PSNR', 'SSIM', '-LIPIS']
+    nr_iqa_l = ['-NIQE', 'LR']
 
+    # Coloring on axis name
+    for ax in g.axes.flatten():
+        if ax.get_xlabel() in fr_iqa_l:
+            ax.set_xlabel(ax.get_xlabel(), color='tab:blue')
+        if ax.get_xlabel() in nr_iqa_l:
+            ax.set_xlabel(ax.get_xlabel(), color='tab:red')
+    
+    plt.savefig('scatter_matrix_1200.png', bbox_inches='tight', pad_inches=0.04, dpi=200)
     plt.close()
 
-    sns.heatmap(corr, cbar = True, square = True, vmin = -1.0, vmax =  1.0, center = 0, annot = True, annot_kws={ 'size':15 },
+
+    # 2. plot scatter corr matrix
+    g = sns.heatmap(corr, cbar = True, square = True, vmin = -1.0, vmax =  1.0, center = 0, annot = True, annot_kws={ 'size':15 },
 	fmt='.2f', xticklabels = corr.columns.values, yticklabels = corr.columns.values,)
+    
+    # Coloring on axis name
+    for ax in g.axes.flatten():
+        if ax.get_xlabel() in fr_iqa_l:
+            ax.set_xlabel(ax.get_xlabel(), color='tab:blue')
+        if ax.get_xlabel() in nr_iqa_l:
+            ax.set_xlabel(ax.get_xlabel(), color='tab:red')
+    
     plt.savefig('scatter_corr_matrix_1200.png', bbox_inches='tight', pad_inches=0.04, dpi=300)
+
 
 
 if __name__ == '__main__':
 
+    # Load from json file
     json_path = '../STDAN_modified/exp_log/train/ToYNU/2024-12-16T121335_VT3_ESTDAN_v3_BSD_3ms24ms/epoch-1200_BSD_3ms24ms.json'
-
     with open(json_path, 'r') as file:
         data = json.load(file)
     
-
+    # Make dataframe
     flattened_data = make_flatten_data(data)
     flattened_df = pd.DataFrame(flattened_data)
 
-
+    # Change axis order
     new_order = ['PSNR', 'SSIM', '-LPIPS', '-NIQE', 'LR']
     flattened_df = flattened_df[new_order]
     flattened_df = add_seq_column(flattened_df)
 
     print(flattened_df)
 
+    # Use 'plot_plotly' or 'plot_sns'
+    
     # plot_plotly(flattened_df)
     plot_sns(flattened_df)
 
