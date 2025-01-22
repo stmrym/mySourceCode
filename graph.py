@@ -84,8 +84,8 @@ class dataPlot():
         cdf = np.arange(1, n+1)/n
 
         # ax.plot(ssim_data, cdf, label=self.label, **self.kwargs)
-        ax.plot(sorted_x_data, cdf, label=self.label, linestyle='-', **self.kwargs)
-        # ax.plot(sorted_y_data, cdf, label=self.label, linestyle = '-', **self.kwargs)
+        # ax.plot(sorted_x_data, cdf, label=self.label, linestyle='-', **self.kwargs)
+        ax.plot(sorted_y_data, cdf, label=self.label, linestyle = '-', **self.kwargs)
         # ax.plot(ssim_data, cdf, label=self.label, linestyle = '-', **self.kwargs)
 
 
@@ -95,36 +95,36 @@ def plot_si_vs_sm():
     class_list = [
 
         # for CDF
-        dataPlot(
-                csv_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
-                csv_avg_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
-                label = 'STDAN',
-                c = 'blue',
-                # marker = '.',
-                # s = 5,
-                # linewidths = 1,
-                # facecolor = 'None',
-                # edgecolors = 'blue'
-                ),
+        # dataPlot(
+        #         csv_path = '../STDAN_modified/STDANet_train_ckpt/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
+        #         csv_avg_path = '../STDAN_modified/STDANet_train_ckpt/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
+        #         label = 'STDANet',
+        #         c = 'blue',
+        #         # marker = '.',
+        #         # s = 5,
+        #         # linewidths = 1,
+        #         # facecolor = 'None',
+        #         # edgecolors = 'blue'
+        #         ),
 
 
-        dataPlot(
-                csv_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
-                csv_avg_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
-                label = r'ESTDAN + $\mathcal{L}_\mathrm{f}$ (Ours)',
-                c = 'red',
-                # marker = '.',
-                # s = 5,
-                # linewidths = 1,
-                # facecolor = 'None',
-                # edgecolors = 'red'
-                ),  
+        # dataPlot(
+        #         csv_path = '../STDAN_modified/STDANet_train_ckpt/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
+        #         csv_avg_path = '../STDAN_modified/STDANet_train_ckpt/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
+        #         label = r'Proposed 1 (ESTDANet)',
+        #         c = 'red',
+        #         # marker = '.',
+        #         # s = 5,
+        #         # linewidths = 1,
+        #         # facecolor = 'None',
+        #         # edgecolors = 'red'
+        #         ),  
 
         # for scatterplot
         # dataPlot(
-        #         csv_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
-        #         csv_avg_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
-        #         label = 'STDAN',
+        #         csv_path = '../STDAN_modified/STDANet_train_ckpt/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
+        #         csv_avg_path = '../STDAN_modified/STDANet_train_ckpt/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
+        #         label = 'STDANet',
         #         c = 'blue',
         #         marker = '.',
         #         s = 5,
@@ -135,9 +135,9 @@ def plot_si_vs_sm():
 
 
         # dataPlot(
-        #         csv_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
-        #         csv_avg_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
-        #         label = r'ESTDAN + $\mathcal{L}_\mathrm{f}$ (Ours)',
+        #         csv_path = '../STDAN_modified/STDANet_train_ckpt/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
+        #         csv_avg_path = '../STDAN_modified/STDANet_train_ckpt/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
+        #         label = 'Proposed 1 (ESTDANet)',
         #         c = 'red',
         #         marker = '.',
         #         s = 5,
@@ -146,85 +146,86 @@ def plot_si_vs_sm():
         #         # edgecolors = 'red'
         #         ),  
 
-        # dataPlot(
-        #         csv_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
-        #         csv_avg_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
-        #         label = 'STDAN (BSD)',
-        #         # c = 'blue',
-        #         marker = '.',
-        #         s = 100,
-        #         linewidths = 1,
-        #         facecolor = 'None',
-        #         edgecolors = 'blue'
-        #         ),
+        dataPlot(
+                csv_path = '../STDAN_modified/STDANet_train_ckpt/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
+                csv_avg_path = '../STDAN_modified/STDANet_train_ckpt/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
+                label = 'STDANet (BSD)',
+                # c = 'blue',
+                marker = '.',
+                s = 100,
+                linewidths = 1,
+                facecolor = 'None',
+                edgecolors = 'blue'
+                ),
 
-        # dataPlot(
-        #         csv_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/GOPR*.csv',
-        #         csv_avg_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
-        #         label = 'STDAN (GoPro)',
-        #         # c = 'blue',
-        #         marker = '^',
-        #         s = 30,
-        #         linewidths = 1,
-        #         facecolor = 'None',
-        #         edgecolors = 'blue'
-        #         ),
+        dataPlot(
+                csv_path = '../STDAN_modified/STDANet_train_ckpt/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/GOPR*.csv',
+                csv_avg_path = '../STDAN_modified/STDANet_train_ckpt/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
+                label = 'STDANet (GoPro)',
+                # c = 'blue',
+                marker = '^',
+                s = 30,
+                linewidths = 1,
+                facecolor = 'None',
+                edgecolors = 'blue'
+                ),
 
-        # dataPlot(
-        #         csv_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
-        #         csv_avg_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
-        #         label = r'ESTDAN + $\mathcal{L}_\mathrm{f}$ (BSD)',
-        #         # c = 'red',
-        #         marker = '.',
-        #         s = 100,
-        #         linewidths = 1,
-        #         facecolor = 'None',
-        #         edgecolors = 'red'
-        #         ),  
+        dataPlot(
+                csv_path = '../STDAN_modified/STDANet_train_ckpt/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
+                csv_avg_path = '../STDAN_modified/STDANet_train_ckpt/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
+                label = 'Proposed 1 (BSD)',
+                # c = 'red',
+                marker = '.',
+                s = 100,
+                linewidths = 1,
+                facecolor = 'None',
+                edgecolors = 'red'
+                ),  
                 
-        # dataPlot(
-        #         csv_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/GOPR*.csv',
-        #         csv_avg_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
-        #         label = r'ESTDAN + $\mathcal{L}_\mathrm{f}$ (GoPro)',
-        #         # c = 'red',
-        #         marker = '^',
-        #         s = 30,
-        #         linewidths = 1,
-        #         facecolor = 'None',
-        #         edgecolors = 'red'
-        #         ),   
+        dataPlot(
+                csv_path = '../STDAN_modified/STDANet_train_ckpt/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/GOPR*.csv',
+                csv_avg_path = '../STDAN_modified/STDANet_train_ckpt/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
+                label = 'Proposed 1 (GoPro)',
+                # c = 'red',
+                marker = '^',
+                s = 30,
+                linewidths = 1,
+                facecolor = 'None',
+                edgecolors = 'red'
+                ),   
     ]
-
 
 
     plt.rcParams["font.size"] = 13
     plt.rcParams['xtick.direction'] = 'in'
     plt.rcParams['ytick.direction'] = 'in'
+    
+    
     fig, ax = plt.subplots(dpi=200, tight_layout=True)
 
-    # ax.axline((0,1), (1,0), color='black', lw=0.8)
+    ax.axline((0,1), (1,0), color='black', lw=0.8)
     for data_inst in class_list:
-        data_inst.read_csv_append_list()
-        # data_inst.read_avg_csv_append_list()
-        # data_inst.scatter_plot(ax)
-        data_inst.ecdf_plot(ax)
+        # data_inst.read_csv_append_list()
+        data_inst.read_avg_csv_append_list()
+        data_inst.scatter_plot(ax)
+        # data_inst.ecdf_plot(ax)
 
-    # ax.set_xlabel(r'Motion-Weighted $\mathrm{SSIM_m}$', fontsize=16)
-    # ax.set_ylabel(r'Inverse Motion-Weighted $\mathrm{SSIM_i}$', fontsize=16)
-    
+    ax.set_xlabel(r'Motion-Weighted $\mathrm{SSIM_m}$', fontsize=16)
+    ax.set_ylabel(r'Inverse Motion-Weighted $\mathrm{SSIM_i}$', fontsize=16)
+
 
     ax.set_xticks(np.linspace(0, 1.0, 11), minor=True)
     ax.set_yticks(np.linspace(0, 1.0, 11), minor=True)
     
     # ax.set_xlim([0,1.0])
     # ax.set_ylim([0,1.0])
-    ax.set_xlabel(r'$\mathrm{SSIM_m}$', fontsize=16)
-    ax.set_ylabel(r'Empirical Distribution Function', fontsize=16)
+    # ax.set_xlabel(r'$\mathrm{SSIM_i}$', fontsize=16)
+    # ax.set_ylabel(r'Empirical Distribution Function', fontsize=16)
 
     # ax.legend(markerscale = 4)
     ax.legend(markerscale = 1)
     ax.set_aspect('equal')
-    ax.grid(alpha=0.4)
+    # ax.grid(alpha=0.4)
     plt.tight_layout()
     # fig.patch.set_alpha(0)
     fig.subplots_adjust(left=0, right=1, bottom=0, top=1)

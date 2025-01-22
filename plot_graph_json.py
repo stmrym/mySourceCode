@@ -76,20 +76,24 @@ if __name__ == '__main__':
 
         plot_list = [
 
-            dataPlot(json_path = '../STDAN_modified/exp_log/test/2024-12-16T180921__STDAN_Mi11Lite/epoch-0850_Mi11Lite.json',
+            dataPlot(json_path = '../STDAN_modified/exp_log/train/ToYNU/2024-12-16T180921__STDAN_Mi11Lite/epoch-0850_Mi11Lite.json',
                 seq=seq, metric=metric, ls='-', lw=1.0, c='black', label = 'STDAN epoch-0850',
             ),
 
-            dataPlot(json_path = '../STDAN_modified/exp_log/test/2024-12-17T143130__ESTDAN_v3_Mi11Lite/epoch-0850_Mi11Lite.json',
+            dataPlot(json_path = '../STDAN_modified/exp_log/train/ToYNU/2024-12-17T143130__ESTDAN_v3_Mi11Lite/epoch-0850_Mi11Lite.json',
                 seq=seq, metric=metric, ls='-', lw=1.0, c='tab:blue', label = 'ESTDAN epoch-0850',
             ),
 
-            dataPlot(json_path = '../STDAN_modified/exp_log/test/2024-12-17T042142_LD_ESTDAN_v3_Mi11Lite/epoch-0150_Mi11Lite.json',
-                seq=seq, metric=metric, ls='-', lw=1.0, c='tab:orange', label = 'ESTDAN LD epoch-0150',
+            # dataPlot(json_path = '../STDAN_modified/exp_log/train/ToYNU/2024-12-19T122927_VT2_ESTDAN_v3_Mi11Lite/epoch-0700_Mi11Lite.json',
+            #     seq=seq, metric=metric, ls='-', lw=1.0, c='tab:orange', label = 'ESTDAN+VT1 epoch-0700',
+            # ),
+
+            dataPlot(json_path = '../STDAN_modified/exp_log/train/ToYNU/2024-12-11T210210__VT3__ESTDAN_v3_BSD_3ms24ms_GOPRO/epoch-0650_Mi11Lite.json',
+                seq=seq, metric=metric, ls='-', lw=1.0, c='tab:orange', label = 'ESTDAN+VT2 epoch-0650',
             ),
 
-            dataPlot(json_path = '../STDAN_modified/exp_log/train/2024-12-11T210210__VT3__ESTDAN_v3_BSD_3ms24ms_GOPRO/epoch-0650_Mi11Lite.json',
-                seq=seq, metric=metric, ls='-', lw=1.0, c='tab:red', label = 'ESTDAN VT3 epoch-0650',
+            dataPlot(json_path = '../STDAN_modified/exp_log/train/ToYNU/2024-12-20T090716__VT3_CM__ESTDAN_v3_BSD_3ms24ms_GOPRO/epoch-1200_Mi11Lite.json',
+                seq=seq, metric=metric, ls='-', lw=1.0, c='tab:red', label = 'ESTDAN+VT2+CM epoch-1200',
             )
 
             # dataPlot(json_path = 'stdan_result.json',

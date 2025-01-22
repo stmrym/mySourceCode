@@ -53,7 +53,7 @@ def plot_sns(df):
 
 if __name__ == '__main__':
 
-    json_path = '../STDAN_modified/exp_log/test/2024-12-16T121335_VT3_ESTDAN_v3_BSD_3ms24ms/epoch-1200_BSD_3ms24ms.json'
+    json_path = '../STDAN_modified/exp_log/train/ToYNU/2024-12-16T121335_VT3_ESTDAN_v3_BSD_3ms24ms/epoch-1200_BSD_3ms24ms.json'
 
     with open(json_path, 'r') as file:
         data = json.load(file)
@@ -69,7 +69,7 @@ if __name__ == '__main__':
 
     print(flattened_df)
 
-    plot_plotly(flattened_df)
-    # plot_sns(flattened_df)
+    # plot_plotly(flattened_df)
+    plot_sns(flattened_df)
 
 
