@@ -64,7 +64,7 @@ def add_patch_inside(path: str, save_name: str, thick_size: int, scale_list: Lis
 
 
 
-def add_patch_outside(path: str, save_name: str, thick_size: int, xywh_list: List[tuple], color_list: List[tuple], **kwargs) -> None:
+def add_patch_outside(path: str, save_name: str, thick_size: int, xywh_list: List[tuple], color_list: List[tuple], loc: str, **kwargs) -> None:
 
     img = cv2.imread(path)
     assert img is not None, 'image empty.'
@@ -72,56 +72,89 @@ def add_patch_outside(path: str, save_name: str, thick_size: int, xywh_list: Lis
 
     # calculate resize ratio
     w_list = [xyhw[2] for xyhw in xywh_list]
+    h_list = [xyhw[3] for xyhw in xywh_list]
+
     denom = 0
-    for i in range(len(w_list)):
-        # h1*h2*...*wi*...*hn
-        denom += w_list[i] * np.prod([xyhw[3] for j, xyhw in enumerate(xywh_list) if j != i])
 
-    bottom = []
-    # creating patches
-    for i, ((x, y, w, h), color) in enumerate(zip(xywh_list, color_list)):
-        k = img_w * np.prod([xyhw[3] for j, xyhw in enumerate(xywh_list) if j != i]) / denom
-        # clipping
-        clip = cv2.resize(img[y:y+h, x:x+w], dsize=None, fx=k, fy=k, interpolation=cv2.INTER_NEAREST)
+    if loc == 'b':
+        for i in range(len(w_list)):
+            # h1*h2*...*wi*...*hn
+            denom += w_list[i] * np.prod([h for j, h in enumerate(h_list) if j != i])
 
-        # draw line
-        cv2.rectangle(clip, (1, 1), (clip.shape[1]-2, clip.shape[0]-2), color=color, thickness=thick_size)
-        cv2.rectangle(img, (x, y, w, h), color=color, thickness=thick_size)
-        bottom.append(clip)
-        print(clip.shape)
+        bottom = []
+        # creating patches
+        for i, ((x, y, w, h), color) in enumerate(zip(xywh_list, color_list)):
+            k = img_w * np.prod([h for j, h in enumerate(h_list) if j != i]) / denom
+            # clipping
+            clip = cv2.resize(img[y:y+h, x:x+w], dsize=None, fx=k, fy=k, interpolation=cv2.INTER_NEAREST)
 
-    stack = np.hstack(bottom)
-    out = np.vstack((img, stack))
-    cv2.imwrite(save_name, out)
+            # draw line
+            cv2.rectangle(clip, (1, 1), (clip.shape[1]-2, clip.shape[0]-2), color=color, thickness=thick_size)
+            cv2.rectangle(img, (x, y, w, h), color=color, thickness=thick_size)
+            bottom.append(clip)
+            print(clip.shape)
 
+        stack = np.hstack(bottom)
+        out = np.vstack((img, stack))
+        cv2.imwrite(save_name, out)
+
+    elif loc == 'r':
+        for i in range(len(h_list)):
+            # w1*w2*...*hi*...*wn
+            denom += h_list[i] * np.prod([w for j, w in enumerate(w_list) if j != i])
+
+        bottom = []
+        # creating patches
+        for i, ((x, y, w, h), color) in enumerate(zip(xywh_list, color_list)):
+            k = img_h * np.prod([w for j, w in enumerate(w_list) if j != i]) / denom
+            # clipping
+            clip = cv2.resize(img[y:y+h, x:x+w], dsize=None, fx=k, fy=k, interpolation=cv2.INTER_NEAREST)
+
+            # draw line
+            cv2.rectangle(clip, (1, 1), (clip.shape[1]-2, clip.shape[0]-2), color=color, thickness=thick_size)
+            cv2.rectangle(img, (x, y, w, h), color=color, thickness=thick_size)
+            bottom.append(clip)
+
+        stack = np.vstack(bottom)
+        out = np.hstack((img, stack))
+        cv2.imwrite(save_name, out)       
+    else:
+        print(f'Invalid loc: {loc}')
+        exit()
 
 
 if __name__ == '__main__':
 
-    name = '067_00000040_k7_w2'
+    name = '5_00045_1_b'
     kwargs = {
-        'path' : '/mnt/d/results/20241210/%s.png' % name,
-        'save_name' : '/mnt/d/results/20241210/%s_clip_unsharp.png' % name,
+        'path' : '/mnt/d/python/master_thesis/source/%s.png' % name,
+        'save_name' : '/mnt/d/python/master_thesis/%s_clip_unsharp.png' % name,
         'xywh_list' : [
-            # 0000045
-            # (120, 340, 210, 90),
-            # 0000045_char
-            (200, 345, 80, 80),
-            # 000030
-            # (245, 49, 80, 80),
-            # (470, 260, 140, 140),
+            # 000090
+            # (30, 30, 280, 280)
+            # 00000002_b
+            # (20, 315, 130, 80),
+            # 00034
+            # (1030, 270, 120, 90),
+            # 00081
+            # (50, 50, 200, 130),
+            # (760, 270, 150, 150)
+            # 00045
+            (728, 270, 200, 90),
+            (770, 435, 130, 70)
         ],
         'color_list': [
-            (0,255,0),
+            # (0,255,0),
             (0,0,255),
             (255,0,0)
         ],
         'thick_size' : 4,
         'scale_list' : [4,],
-        'loc_list': ['ur',]
+        'loc_list': ['ur',],
+        'loc': 'b'    # 'b' bottom or 'r' right
     }
 
-    # add_patch_outside(**kwargs)
+    add_patch_outside(**kwargs)
     # add_patch_inside(**kwargs)
-    clip_image(**kwargs)
+    # clip_image(**kwargs)
     # clip_image()

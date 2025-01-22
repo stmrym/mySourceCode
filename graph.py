@@ -96,8 +96,8 @@ def plot_si_vs_sm():
 
         # for CDF
         dataPlot(
-                csv_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
-                csv_avg_path = '../STDAN_modified/exp_log/train/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
+                csv_path = '../STDAN_modified/STDANet_train_ckpt/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
+                csv_avg_path = '../STDAN_modified/STDANet_train_ckpt/2024-05-20T193725_STDAN_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
                 label = 'STDAN',
                 c = 'blue',
                 # marker = '.',
@@ -109,8 +109,8 @@ def plot_si_vs_sm():
 
 
         dataPlot(
-                csv_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
-                csv_avg_path = '../STDAN_modified/exp_log/train/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
+                csv_path = '../STDAN_modified/STDANet_train_ckpt/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/metrics_csv/*.csv',
+                csv_avg_path = '../STDAN_modified/STDANet_train_ckpt/2024-06-10T115520_F_ESTDAN_v3_BSD_3ms24ms_GOPRO/visualization/c1200_out_maskedssim_cir/avg_metrics.csv',
                 label = r'ESTDAN + $\mathcal{L}_\mathrm{f}$ (Ours)',
                 c = 'red',
                 # marker = '.',
@@ -196,10 +196,12 @@ def plot_si_vs_sm():
     ]
 
 
-
     plt.rcParams["font.size"] = 13
     plt.rcParams['xtick.direction'] = 'in'
     plt.rcParams['ytick.direction'] = 'in'
+    
+    
+    print('aaa')
     fig, ax = plt.subplots(dpi=200, tight_layout=True)
 
     # ax.axline((0,1), (1,0), color='black', lw=0.8)
@@ -211,7 +213,7 @@ def plot_si_vs_sm():
 
     # ax.set_xlabel(r'Motion-Weighted $\mathrm{SSIM_m}$', fontsize=16)
     # ax.set_ylabel(r'Inverse Motion-Weighted $\mathrm{SSIM_i}$', fontsize=16)
-    
+
 
     ax.set_xticks(np.linspace(0, 1.0, 11), minor=True)
     ax.set_yticks(np.linspace(0, 1.0, 11), minor=True)
